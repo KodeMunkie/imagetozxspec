@@ -20,8 +20,7 @@ affected by flashing images.
 ### Distribution
 Should you wish to distribute this software and want to provide attribution
 then please link to the GitHub page <https://github.com/KodeMunkie/imagetozxspec>
-N.b. previous versions of this clause can now be ignored as of release
-to this code to GitHub.
+N.b. previous versions of this clause can now be ignored.
 
 ### What is Image to ZX Spectrum?
 Image to ZX Spec(trum) is a utility to convert image and video 
