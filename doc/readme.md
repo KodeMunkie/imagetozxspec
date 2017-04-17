@@ -18,19 +18,10 @@ affected by flashing images.
 
 
 ### Distribution
-Distribution of the source and compiled code is granted to World of 
-Spectrum (www.worldofspectrum.org) and Silent Software (Development) 
-only.
-Should you wish to distribute this software and are not either of
-the above parties please provide a link to the software home page
-<http://www.silentdevelopment.co.uk> - do not directly link to the
-software zip distribution - leeching is not very polite. 
-Alternatively, host the zip file yourself, but a link to the 
-aforementioned website must be clearly visible near to the download
-link. 
-If you wish to distribute this via physical medium, e.g. CD please 
-contact me instead - I want a copy of your mag/cd/disk/tape(?!) :))
-
+Should you wish to distribute this software and want to provide attribution
+then please link to the GitHub page <https://github.com/KodeMunkie/imagetozxspec>
+N.b. previous versions of this clause can now be ignored as of release
+to this code to GitHub.
 
 ### What is Image to ZX Spectrum?
 Image to ZX Spec(trum) is a utility to convert image and video 
