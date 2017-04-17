@@ -1,0 +1,29 @@
+Image To ZX Spec is licensed under the AGPLv3 but uses open source third party components
+that are covered by other AGPLv3 compatible licences - text copies of which are included
+in this distribution.
+
+Third party licences are as follows:
+
+Humble Video 
+Licence: AGPL 3
+Website: https://github.com/artclarke/humble-video
+
+VLCJ 3.0.0 - Required to support a larger range of video formats (usage optional)
+Licence: GPL 3
+Website: https://github.com/caprica/vlcj
+
+JNA 4.0.0 - Required by VLCJ for native encoder/decoder support
+Licence: Apache 2.0 (dual licence - LGPL not used)
+Website: https://github.com/java-native-access/jna
+
+SLF4J
+Licence: MIT
+Website: http://www.slf4j.org/
+
+Apache Commons, Collections, Log4j, Spring, Disruptor, BigList
+Licence: Apache 2.0 licence.
+Websites:
+https://www.apache.org/
+http://projects.spring.io/spring-framework/
+https://github.com/conversant/disruptor
+http://www.magicwerk.org/page-collections-overview.html

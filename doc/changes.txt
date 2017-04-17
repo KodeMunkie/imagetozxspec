@@ -1,0 +1,189 @@
+Image to ZX Spec Changes
+------------------------
+
+Version 2.0.1
+- Fixed bug with main window extending off screen
+- Fixed image labelling bug
+- Fixed bug adding last frames of video to a new video if conversion manually stopped
+- Fixed bug with multi image popup preview's image being too large when unscaled
+- Fixed bug in SCR converter that would fail to output some images/second Gigascreen image
+- Added 2 new Gigascreen export attribute orders
+- Added pre-processing slider reset to defaults button
+- Removed some redundant dither processing
+- Removed test framework from production build
+- Cleaned up some code
+
+Version 2.0.0
+- Updated for Java 8.
+- Squashed MacOS directory bug causing files not to be saved (Java bug).
+- Integrated native video decoding via HumbleVideo.
+- Massive performance improvement for processing video.
+- Improved code quality with tests, logging and Java 8 features.
+- Fixed Gigascreen original scale conversion crash bug.
+- Fixed original scale conversion converted edge pixels bug.
+- Fixed black threshold scaling range.
+- Added warnings for poor options combinations.
+- Changed text output behaviour for multiple images - many files now instead of one.
+- Modified About to show free memory.
+- Fixed small graphics memory leak.
+- Added turbo mode.
+
+Version 1.4.0
+- Huge improvements to GigaScreen (102 colour) image quality.
+- Added GigaScreen Attribute options.
+- SCR Gigascreen export image order by Hue/Saturation/Brightness.
+- Added new GigaScreen BASIC ZX Spectrum image loader.
+- Usability improvements and toolbar added to UI.
+- Image quality improvements for prefer detail setting.
+- Accuracy and speed improvements for image pre-processing.
+- Updated VLC4J to allow the video conversion from VLC 2.1.3.
+- Fixed missing character dither.
+- Bug fixes.
+
+Version 1.3.4
+- Updated for Java 7.
+- Added VLC compatible video importing option.
+- Added simultaneous video decode/spectrum encode.
+- Added new prefer detail setting improving output
+- Added new Sierra error diffusion option.
+- Added automatic preference saving.
+- Added dynamic memory allocation (grabs as much free as possible).
+- Added conversion cancel button (finally!)
+- Removed some redundant localisation code.
+- English text and licenses changes.
+
+Version 1.3.3_02
+- Fixed an image resize bug which was forcing output to 256x192.
+- Fixed preview image flicker and preview image input-output synchronisation.
+- Removed two video queue bottlenecks (improves video conversion speed).
+- Removed all video pre-buffering (real time loading and conversion replaces it).
+- Removed non-internationalised video buffering message.
+
+Version 1.3.3_01
+- Added internationalisation support
+- Added new languages - German, Greek, Italian, Polish and Spanish
+
+Version 1.3.3
+- Added random single frame video preview.
+- Added improved video format support.
+- More monochrome dither fixes.
+- More UI changes.
+- Added serpentine error diffusion option.
+- Added error diffusion constraining option.
+- Improved error diffusion accuracy.
+
+Version 1.3.2
+- Added Character Conversion (image to text).
+- Fixed long standing monochrome dithering bug (loss of detail).
+- UI changes for new options and usability changes.
+- Source code contains initial ground work for Muffin web proxy.
+
+Version 1.3.1
+- Added Anim Gif export feature.
+- Updated licence/about information.
+
+Version 1.3.0_01
+- Added support for drag and drop on Ubuntu.
+- Fixed bad line numbering in Simple BASIC Loader.
+- Minor Ubuntu window size issue fixed. 
+
+Version 1.3.0
+- Added "GigaScreen" palette mode (102 colours).
+- Added "Reduced Set Colours" attribute favouritism.
+- Added drag and drop support.
+- Added proportional 256x192 preview capability to the dither 
+preview dialog.
+- Removed lesser used tape loaders. 
+- Fixed main window size bug.
+- Fixed missing dialog icon bug.
+- Improved Contrast slider sensitivity.
+- Improved preview repaint for Java >1.6.0_2x.
+- Updated readme and about dialog text.
+- Updated copyrights.
+
+Version 1.2.1_02
+- Added forced half/full brightness attribute favouritism modes.
+- Changed dither preview font to bold dark grey for easier reading. 
+- Updated the start screen logo to be part Spectrumized.
+
+Version 1.2.1_01
+- Fixed thread safety issue which might occasionally cause missed 
+frames.
+- Removed some unnecessary code and shortened after conversion wait.
+- Updated text on BASIC loaders to describe what the delay does.
+- Added new BASIC Black Simple loader.
+- Updated readme text.
+
+Version 1.2.1
+- Improved UI drop list sizes in Windows.
+- Improved UI spacing on Ubuntu.
+- Small reorganisation of the Options tool bar items.
+- Improved readme.txt documenting the features.
+- Added improved black bordered buffered USR 0 (128K) tap 
+video/slideshow loader.
+
+Version 1.2
+- Added AVI and MOV video conversion (limited codecs however).
+- Added large performance improvements.
+- Added multi CPU work dispatcher engine.
+- Added threads per CPU option.
+- Added tap video/slideshow basic loader option.
+- Added buffered USR 0 (128K) tap video/slideshow loader.
+- Added FPS counter and option (using 2 second interval).
+- Added option to disable the WIP preview.
+- Added option to specify the video sample framerate.
+- Improved Low Error Atkinson dither to 25% error.
+- Improved colour code performance (reduced object overhead).
+- Memory settings changed (>512MB contiguous minimum).
+- Enabled Java aggressive heap mode for better memory use.
+
+Version 1.1
+- Added new Atrribute Favoritism feature to choose the colour set
+to use.
+- Added Dither Preview feature which displays previews with 
+different dithering algorithms (and takes advantage of multi core 
+processors).
+- Updated BASIC slideshow program with new warning to stop tape.
+- Main UI frame has a splash picture.
+- Minor bug fixes to do with colour choice
+- Memory usage increased for larger image conversion.
+
+Version 1.0.5
+- Added Bayer Ordered Dither (2x1)
+- Added Omega Ordered Dither (2x2)
+- Minor code changes including better error messages.
+- Remembering directory locations in the file dialogs
+- OpenGL hardware acceleration switch (disabled by default, source 
+code only adjustment required to enable it due to instability and
+currently only rendering display improvements).
+- Small UI changes
+
+Version 1.0.4
+- Added Ordered Dithering and a substantial number of new modes
+- Added options control for ordered dither intensity
+- Refactored some old code giving a small performance increase
+for screen export and error diffusion dithering
+- Replaced input folder option with file selector so individual
+files can be processed instead
+
+Version 1.0.3
+- New options dialog
+- New dithering options (including Low Error Atkinson)
+- New jpeg image export option
+- New pre-processing options such as brightness, contrast etc.
+- New image scaling options (proportional scaling)
+- Monochrome image mode with colour selection
+- Small code refactor, improvements in speed on some operations
+(speed is not a priority at the moment).
+
+Version 1.0.2 (Internal build only)
+- Numerous new dithering algorithms added
+- Small bug fixes
+
+Version 1.0.1
+- Removed averaging converter (not very good).
+- Added Half Colour Floyd-Steinberg converter.
+- Improved Full Colour Floyd-Steinberg converter (pre-ramps contrast
+for a better result).
+- Small bug fixes
+- Small amount of refactoring (work still in progress)
