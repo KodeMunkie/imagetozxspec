@@ -72,7 +72,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
@@ -80,7 +80,7 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
-							<minimizeJar>true</minimizeJar>
+							<minimizeJar>false</minimizeJar>
 						</configuration>
 					</execution>
 				</executions>
@@ -173,15 +173,19 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
+			<version>2.11.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
 		</dependency>
+
 		<dependency>
 			<groupId>uk.co.caprica</groupId>
 			<artifactId>vlcj</artifactId>
