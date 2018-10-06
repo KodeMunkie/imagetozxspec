@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2017 Silent Software Silent Software (Benjamin Brown)
+ * Copyright (C) 2018 Silent Software Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -399,8 +399,10 @@ public class WorkManager {
         if (!cancel && results.size() > 0) {
             WorkContainer workContainer = results.get(outputSequenceNumber);
             if (workContainer != null) {
-                workOutputter.outputFrame(workContainer);
                 uiFeederThread.execute(() -> workOutputter.previewFrame(workContainer));
+
+                // Frames must be output on a single thread due to chronological sequence requirements for some exporters
+                workOutputter.outputFrame(workContainer);
                 results.remove(outputSequenceNumber);
                 outputSequenceNumber++;
             }

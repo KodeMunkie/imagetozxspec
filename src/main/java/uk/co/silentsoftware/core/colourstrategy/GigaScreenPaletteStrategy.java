@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2017 Silent Software Silent Software (Benjamin Brown)
+ * Copyright (C) 2018 Silent Software Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -36,7 +36,7 @@ public class GigaScreenPaletteStrategy implements ColourChoiceStrategy {
 	 * If this method is called then the wrong processor implementation is being used. 
 	 */
 	@Override
-	public int getClosestColour(int originalAlphaRgb, int[] mostPopularAlphaRgbColours) {
+	public int chooseBestPaletteMatch(int originalAlphaRgb, int[] mostPopularAlphaRgbColours) {
 		throw new UnsupportedOperationException("GigaScreen palette colouring cannot be applied to dither image processors - this is a placeholder class to allow identification during getClosestColour conversions for the GigaScreenConverter.");
 	}
 

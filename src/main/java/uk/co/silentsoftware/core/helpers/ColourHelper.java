@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2017 Silent Software Silent Software (Benjamin Brown)
+ * Copyright (C) 2018 Silent Software Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -45,10 +45,10 @@ public final class ColourHelper {
 	 * Private constructor since we want static use only
 	 */
 	private ColourHelper(){}
-	
+
 	/**
 	 * Retrieves the spectrum colour most like the provided rgb colour
-	 * 
+	 *
 	 * @param rgb the colour to get the spectrum colour for
 	 * @return the spectrum colour
 	 */
@@ -58,7 +58,7 @@ public final class ColourHelper {
 
 	/**
 	 * Retrieves the spectrum colour most like the provided rgb colour
-	 * 
+	 *
 	 * @param red the red component to get the spectrum colour for
 	 * @param green the green component to get the spectrum colour for
 	 * @param blue the blue component to get the spectrum colour for
@@ -102,11 +102,11 @@ public final class ColourHelper {
 
 	/**
 	 * Retrieves the Gigascreen colour most like the provided rgb colour
-	 * 
+	 *
 	 * @param red the red component to get the gigascreen colour for
 	 * @param green the green component to get the gigascreen colour for
 	 * @param blue the blue component to get the gigascreen colour for
-	 * 
+	 *
 	 * @return the gigascreen colour
 	 */
 	public static int getClosestGigascreenColour(int red, int green, int blue) {
@@ -115,7 +115,7 @@ public final class ColourHelper {
 
 	/**
 	 * Retrieves the Gigascreen colour most like the provided rgb colour
-	 * 
+	 *
 	 * @param rgb the colour to get the gigascreen colour for
 	 * @return the gigascreen colour
 	 */
@@ -134,10 +134,10 @@ public final class ColourHelper {
 		final int[] comps = intToRgbComponents(rgb);
 		return getClosestColourWithDetail(comps[0], comps[1], comps[2], colourSet, OptionsObject.getInstance().getPreferDetail());
 	}
-	
+
 	/**
 	 * Retrieves the colour from the colourSet most like the provided rgb components
-	 * 
+	 *
 	 * @param red the red component
 	 * @param green the green component
 	 * @param blue the blue component
@@ -290,7 +290,7 @@ public final class ColourHelper {
 							
 				// Replace all colours in attribute block (which can be any spectrum colours) with the just the popular two
 				for (int i = 0; i < outRgb.length; ++i) {
-					outRgb[i] = colourChoiceStrategy.getClosestColour(outRgb[i], correctedAlphaColours);
+					outRgb[i] = colourChoiceStrategy.chooseBestPaletteMatch(outRgb[i], correctedAlphaColours);
 				}
 				image.setRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, outRgb, 0, ATTRIBUTE_BLOCK_SIZE);
 			}

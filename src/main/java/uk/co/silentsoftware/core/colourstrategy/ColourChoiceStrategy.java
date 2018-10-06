@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2017 Silent Software Silent Software (Benjamin Brown)
+ * Copyright (C) 2018 Silent Software Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -35,7 +35,7 @@ public interface ColourChoiceStrategy {
 	 * @param mostPopularAlphaRgbColours the rgb values from which to choose the closest match
 	 * @return the closest colour from the most popular array
 	 */
-	int getClosestColour(int originalAlphaRgb, int[] mostPopularAlphaRgbColours);
+	int chooseBestPaletteMatch(int originalAlphaRgb, int[] mostPopularAlphaRgbColours);
 
 	int getClosestColour(int r, int g, int b);
 

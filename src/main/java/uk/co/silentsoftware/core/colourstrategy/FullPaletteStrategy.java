@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2017 Silent Software Silent Software (Benjamin Brown)
+ * Copyright (C) 2018 Silent Software Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -36,7 +36,7 @@ public class FullPaletteStrategy implements ColourChoiceStrategy {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int getClosestColour(int originalAlphaRgb, int[] mostPopularRgbColours) {
+	public int chooseBestPaletteMatch(int originalAlphaRgb, int[] mostPopularRgbColours) {
 		return ColourHelper.getClosestColour(originalAlphaRgb, mostPopularRgbColours);
 	}
 
