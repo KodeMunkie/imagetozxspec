@@ -1,6 +1,11 @@
 Image to ZX Spec Changes
 ------------------------
 
+Version 2.0.2
+- Fixed related bugs to do with output image naming and missing output images
+- Updated copyright
+- Minor code clean up
+
 Version 2.0.1
 - Fixed bug with main window extending off screen
 - Fixed image labelling bug
