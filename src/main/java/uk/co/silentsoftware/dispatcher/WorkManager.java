@@ -22,10 +22,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -177,9 +174,8 @@ public class WorkManager {
      *
      * @param image   the image to apply the dithers to
      * @param dithers the dither strategies to apply
-     * @throws InterruptedException if the processing is interrupted
      */
-    private <T extends DitherStrategy> void generatePopupPreviewDithers(Image image, @SuppressWarnings("unchecked") T... dithers) throws InterruptedException {
+    private <T extends DitherStrategy> void generatePopupPreviewDithers(Image image, @SuppressWarnings("unchecked") T... dithers) {
         Stream<T> stream = Arrays.stream(dithers);
         Runnable runnable = () -> {
             stream.forEach(dither -> {
@@ -240,22 +236,13 @@ public class WorkManager {
      * Polls video and submits frames to the work engine for processing
      *
      * @param uiCallback the callback to control the ui
-     * @param f          the video file to process
+     * @param inputFile  the video file to process
      * @param outFolder  the output folder
      * @throws InterruptedException if the processing is interrupted
      */
-    private void processVideo(UiCallback uiCallback, File f, File outFolder) throws InterruptedException {
-        final VideoLoadedLock videoLoadedLock = new VideoLoadedLock();
+    private void processVideo(UiCallback uiCallback, File inputFile, File outFolder) throws InterruptedException {
         final BlockingQueue<Image> sharedQueue = new DisruptorBlockingQueue<>(MAX_QUEUE_SIZE);
-        exec.execute(() -> {
-            try {
-                OptionsObject.getInstance().getVideoImportEngine().convertVideoToImages(f, false, sharedQueue, videoLoadedLock);
-            } catch (Throwable t) {
-                log.error("Failed to convert video", t);
-                enableInput(uiCallback, t.getMessage());
-            }
-        });
-        videoLoadedLock.waitFor();
+        waitForVideoToSpoolUp(sharedQueue, uiCallback, inputFile);
         Image buf;
         Map<Integer, WorkContainer> results = new ConcurrentHashMap<>();
 
@@ -264,6 +251,7 @@ public class WorkManager {
 
         // The last unique frame number that was processed and outputed
         int outputSequenceNumber = 0;
+
         WorkOutputter workOutputter = null;
         try {
             workOutputter = new WorkOutputter(this, uiCallback, outFolder);
@@ -273,7 +261,8 @@ public class WorkManager {
                     return;
                 }
                 int oldOutputSequenceNumber = outputSequenceNumber;
-                outputSequenceNumber = processFrame(f.getName(), sequenceNumber, outputSequenceNumber, workOutputter, results, buf, uiCallback);
+                processFrame(sequenceNumber+"_"+inputFile.getName(), sequenceNumber, results, buf, uiCallback);
+                outputSequenceNumber = outputNextImage(results, outputSequenceNumber, workOutputter);
                 sequenceNumber++;
                 // Only increase the fps count if it's actually removed an image from
                 // the queue (as opposed to starting the job and waiting for it to become
@@ -283,11 +272,7 @@ public class WorkManager {
                 }
             }
             log.debug("Image relay finished awaiting remaining results");
-            if (!cancel) {
-                while (outputSequenceNumber < sequenceNumber) {
-                    outputSequenceNumber = outputNextImage(f.getName(), results, outputSequenceNumber, workOutputter);
-                }
-            }
+            outputRemainingFrames(outputSequenceNumber, sequenceNumber, results, workOutputter);
         } finally {
             try {
                 if (workOutputter != null) {
@@ -301,6 +286,19 @@ public class WorkManager {
         log.debug("Finished polling result queue");
     }
 
+    private void waitForVideoToSpoolUp(BlockingQueue<Image> sharedQueue, UiCallback uiCallback, File inputFile) {
+        final VideoLoadedLock videoLoadedLock = new VideoLoadedLock();
+        exec.execute(() -> {
+            try {
+                OptionsObject.getInstance().getVideoImportEngine().convertVideoToImages(inputFile, false, sharedQueue, videoLoadedLock);
+            } catch (Throwable t) {
+                log.error("Failed to convert video", t);
+                enableInput(uiCallback, t.getMessage());
+            }
+        });
+        videoLoadedLock.waitFor();
+    }
+
     /**
      * Inner core method for the process files method that specifically deals
      * with a single files. The files are loaded as images and these are put
@@ -311,47 +309,49 @@ public class WorkManager {
      * @param uiCallback the callback to control the ui
      * @param inFiles    the single image files to process
      * @param outFolder  the output folder
-     * @throws InterruptedException if the processing is interrupted
      */
-    private void processSingleFiles(UiCallback uiCallback, File[] inFiles, File outFolder) throws InterruptedException {
+    private void processSingleFiles(UiCallback uiCallback, File[] inFiles, File outFolder) {
         if (ArrayUtils.isEmpty(inFiles)) {
             return;
         }
-        Map<Integer, WorkContainer> results = new ConcurrentHashMap<>();
-        int sequenceNumber = 0;
-        int outputSequenceNumber = 0;
-        List<File> files = Arrays.asList(inFiles);
         WorkOutputter workOutputter = null;
         try {
+            int sequenceNumber = 0;
+            int outputSequenceNumber = 0;
+            Map<Integer, WorkContainer> results = new ConcurrentHashMap<>();
+            List<File> files = Arrays.asList(inFiles);
             workOutputter = new WorkOutputter(this, uiCallback, outFolder);
             for (File f : files) {
                 if (cancel) {
                     return;
                 }
                 int oldOutputSequenceNumber = outputSequenceNumber;
-                outputSequenceNumber = processFrame(f.getName(), sequenceNumber, outputSequenceNumber, workOutputter, results, readImage(f), uiCallback);
+                processFrame(f.getName(), sequenceNumber, results, readImage(f), uiCallback);
+                outputSequenceNumber = outputNextImage(results, outputSequenceNumber, workOutputter);
                 sequenceNumber++;
                 // Only increase the fps count if it's actually removed an image
-                // from the queue
-                // (as opposed to starting the job and waiting for it to become
+                // from the queue (as opposed to starting the job and waiting for it to become
                 // available)
                 if (outputSequenceNumber > oldOutputSequenceNumber) {
                     fpsFrameCount++;
                 }
             }
-            if (!cancel) {
-                while (outputSequenceNumber < sequenceNumber) {
-                    outputSequenceNumber = outputNextImage(inFiles[outputSequenceNumber].getName(), results, outputSequenceNumber, workOutputter);
-                }
-            }
+            outputRemainingFrames(outputSequenceNumber, sequenceNumber, results, workOutputter);
         } finally {
             try {
                 workOutputter.processEndStep();
             } catch (Exception e) {
                 log.error("Unable to process end step", e);
             }
-            ;
             enableInput(uiCallback, LanguageSupport.getCaption("main_operation_finished"));
+        }
+    }
+
+    private void outputRemainingFrames(int outputSequenceNumber, int sequenceNumber, Map<Integer, WorkContainer> results, WorkOutputter workOutputter) {
+        if (!cancel) {
+            while (outputSequenceNumber < sequenceNumber) {
+                outputSequenceNumber = outputNextImage(results, outputSequenceNumber, workOutputter);
+            }
         }
     }
 
@@ -360,43 +360,21 @@ public class WorkManager {
      *
      * @param name                 the output name
      * @param sequenceNumber       the sequence number for this frame
-     * @param outputSequenceNumber the last outputed frame sequence number
-     * @param workOutputter        the work outputter instance
      * @param results              the results map with frame number to image
      * @param image                the image to convert
      * @param uiCallback           the uicallback for error messages
-     * @return the last outputed sequence number
-     * @throws InterruptedException if processing fails
+     * @return the last outputted sequence number
      */
-    private int processFrame(String name, int sequenceNumber, int outputSequenceNumber, WorkOutputter workOutputter, Map<Integer, WorkContainer> results,
-                             Image image, UiCallback uiCallback) throws InterruptedException {
+    private void processFrame(String name, int sequenceNumber, Map<Integer, WorkContainer> results,
+                             Image image, UiCallback uiCallback) {
         try {
-            final int sequenceFinal = sequenceNumber;
-            exec.execute(() -> results.put(sequenceFinal, workDispatcher.submitFrame(image, StringUtils.EMPTY + sequenceNumber)));
+            exec.execute(() -> results.put(sequenceNumber, workDispatcher.submitFrame(image, StringUtils.EMPTY + name)));
         } catch (OutOfMemoryError oome) {
             uiCallback.setStatusMessage(oome.getMessage());
             log.error("Out of memory on frame", oome);
-            outputSequenceNumber++;
-            return outputSequenceNumber;
         } catch (Throwable t) {
             // Ignore it and try to continue
             log.error("Unhandled throwable", t);
-        }
-        return outputNextImage(name, results, outputSequenceNumber, workOutputter);
-    }
-
-    /**
-     * Sets the work container image id based on whether it is an image or video
-     *
-     * @param name                 the base name of the input file
-     * @param workContainer        the WorkContainer to modify
-     * @param outputSequenceNumber the sequenceNumber for this image
-     */
-    private void setImageId(String name, WorkContainer workContainer, int outputSequenceNumber) {
-        if (isVideo(name)) {
-            workContainer.setImageId(outputSequenceNumber + "_" + name);
-        } else {
-            workContainer.setImageId(name);
         }
     }
 
@@ -404,33 +382,26 @@ public class WorkManager {
      * Outputs the given output sequence number frame if it has been processed
      * otherwise returns
      *
-     * @param name                 the name of input file
      * @param results              the map of workcontainer results
      * @param outputSequenceNumber the frame number to output
      * @param workOutputter        the output object instance
      * @return the updated outputted sequence number if a frame was output,
      * otherwise the original outputSequenceNumber
      */
-    private int outputNextImage(String name, Map<Integer, WorkContainer> results, int outputSequenceNumber, WorkOutputter workOutputter) {
+    private int outputNextImage(Map<Integer, WorkContainer> results, int outputSequenceNumber, WorkOutputter workOutputter) {
         // Yield gives the system a chance to breath - the work has just been added for processing
         // but may not yet be available. Removing this call results in 10-20% better performance but
         // stuttering video preview
         if (!OptionsObject.getInstance().getTurboMode()) {
             Thread.yield();
         }
+
         if (!cancel && results.size() > 0) {
             WorkContainer workContainer = results.get(outputSequenceNumber);
             if (workContainer != null) {
-                setImageId(name, workContainer, outputSequenceNumber);
                 workOutputter.outputFrame(workContainer);
-                final int previewSeqNumber = outputSequenceNumber;
-                uiFeederThread.execute(() -> {
-                    try {
-                        workOutputter.previewFrame(workContainer);
-                    } finally {
-                        results.remove(previewSeqNumber);
-                    }
-                });
+                uiFeederThread.execute(() -> workOutputter.previewFrame(workContainer));
+                results.remove(outputSequenceNumber);
                 outputSequenceNumber++;
             }
         }
@@ -560,7 +531,7 @@ public class WorkManager {
     /**
      * Reset the number of frames processed
      */
-    void resetFrameCount() {
+    private void resetFrameCount() {
         fpsFrameCount = 0;
     }
 }

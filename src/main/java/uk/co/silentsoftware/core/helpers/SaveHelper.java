@@ -25,6 +25,7 @@ import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,8 @@ public class SaveHelper {
 	 */
 	public static void saveImage(final BufferedImage output, final File destFolder, final String fileName, final String formatName) throws IOException {
 		log.debug("Dest folder {}, filename {}, formatName {}", destFolder, fileName, formatName);
-		File destFile = new File(destFolder.getAbsolutePath()+"/"+fileName.substring(0, fileName.lastIndexOf("."))+FILE_SUFFIX+formatName);
+		String baseFileName = getBaseName(fileName);
+		File destFile = new File(destFolder.getAbsolutePath()+"/"+baseFileName+FILE_SUFFIX+formatName);
 		deleteFileIfExists(destFile);
 		log.debug("Writing image to {} with format {}", destFile, formatName);
 		try (OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile))) {
@@ -61,6 +63,13 @@ public class SaveHelper {
 			log.error("Unable to save byte data for file {}", destFile, io);	
 			throw io;
 		}
+	}
+
+	private static String getBaseName(String fileName) {
+		if (fileName.contains(".")) {
+			return fileName.substring(0, fileName.lastIndexOf("."));
+		}
+		return fileName;
 	}
 	
 	/**

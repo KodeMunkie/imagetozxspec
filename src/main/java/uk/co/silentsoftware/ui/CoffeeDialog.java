@@ -46,7 +46,7 @@ class CoffeeDialog {
 			JTextPane aboutField = new JTextPane();
 			aboutField.setContentType("text/html");
 			aboutField.setText("<h2>You seem to be enjoying Image to ZX Spec!</h2>" +
-					"Did you know Image to ZX Spec has been in development for the last 7 years?<br>"+
+					"Did you know Image to ZX Spec has been in development for the last 8 years?<br>"+
 					"That's a lot of coffee, so please consider a contribution of any amount to the<br>"+
 					"developer's coffee buying budget!<br>"+
 					"<h3><a href='"+COFFEE_LINK+"'>Buy the developer a coffee</a></h3>"+

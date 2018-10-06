@@ -46,7 +46,7 @@ public class ImageToZxSpec {
 	private static final Logger log = LoggerFactory.getLogger(ImageToZxSpec.class);
 
 	// TODO: Use build system properties
-	private static final String NAME_COPYRIGHT = "Image to ZX Spec 2.0.1 © Silent Software 2017";
+	private static final String NAME_COPYRIGHT = "Image to ZX Spec 2.0.2 © Silent Software 2018";
 
 	public static final ImageIcon IMAGE_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/logo.png"));
 	private static final ImageIcon OPEN_FILE_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/New Document.png"));

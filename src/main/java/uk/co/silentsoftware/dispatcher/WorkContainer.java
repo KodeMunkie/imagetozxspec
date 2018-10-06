@@ -57,10 +57,6 @@ class WorkContainer {
 		return imageId;
 	}
 
-	void setImageId(String imageId) {
-		this.imageId = imageId;
-	}
-
 	ResultImage[] getResultImage() {
 		return resultImage;
 	}

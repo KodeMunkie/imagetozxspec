@@ -16,20 +16,9 @@
  */
 package uk.co.silentsoftware.dispatcher;
 
-import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
-import io.humble.ferry.Buffer;
 import org.magicwerk.brownies.collections.BigList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import uk.co.silentsoftware.config.OptionsObject;
 import uk.co.silentsoftware.core.converters.image.ResultImage;
 import uk.co.silentsoftware.core.converters.spectrum.ScrConverter;
@@ -39,6 +28,14 @@ import uk.co.silentsoftware.core.converters.video.GifConverter;
 import uk.co.silentsoftware.core.helpers.ImageHelper;
 import uk.co.silentsoftware.core.helpers.SaveHelper;
 import uk.co.silentsoftware.ui.ImageToZxSpec.UiCallback;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 
 /**
  * Manages the work output, i.e. using the work container results it 
