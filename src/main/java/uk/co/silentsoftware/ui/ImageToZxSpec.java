@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2018 Silent Software Silent Software (Benjamin Brown)
+ * Copyright (C) 2019 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -46,7 +46,7 @@ public class ImageToZxSpec {
 	private static final Logger log = LoggerFactory.getLogger(ImageToZxSpec.class);
 
 	// TODO: Use build system properties
-	private static final String NAME_COPYRIGHT = "Image to ZX Spec 2.0.2 © Silent Software 2018";
+	private static final String NAME_COPYRIGHT = "Image to ZX Spec 2.0.3 © Silent Software 2019";
 
 	public static final ImageIcon IMAGE_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/logo.png"));
 	private static final ImageIcon OPEN_FILE_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/New Document.png"));
