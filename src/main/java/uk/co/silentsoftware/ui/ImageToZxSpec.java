@@ -18,6 +18,7 @@ package uk.co.silentsoftware.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.silentsoftware.config.BuildProperties;
 import uk.co.silentsoftware.core.converters.image.DitherStrategy;
 import uk.co.silentsoftware.core.helpers.SaveHelper;
 import uk.co.silentsoftware.dispatcher.WorkManager;
@@ -45,9 +46,8 @@ public class ImageToZxSpec {
 
 	private static final Logger log = LoggerFactory.getLogger(ImageToZxSpec.class);
 
-	// TODO: Use build system properties
-	private static final String NAME_COPYRIGHT = "Image to ZX Spec 2.0.3 © Silent Software 2019";
-
+	private static final String BUILD_VERSION = BuildProperties.getProperty("version");
+	private static final String NAME_COPYRIGHT = "Image to ZX Spec "+BUILD_VERSION+" © Silent Software 2019";
 	public static final ImageIcon IMAGE_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/logo.png"));
 	private static final ImageIcon OPEN_FILE_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/New Document.png"));
 	private static final ImageIcon EXPORT_DIR_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/Export.png"));

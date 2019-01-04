@@ -33,8 +33,7 @@ public class UTF8Control extends Control {
 	
 	private String BUNDLE_SUFFIX = "properties";
 	
-	public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IllegalAccessException,
-			InstantiationException, IOException {
+	public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload) throws IOException {
 		String bundleName = toBundleName(baseName, locale);
 		String resourceName = toResourceName(bundleName, BUNDLE_SUFFIX);
 		ResourceBundle bundle = null;
