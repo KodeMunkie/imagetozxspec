@@ -9,5 +9,5 @@ or create retro art posters (images of any size - memory limited - can
 have a Spectrum effect applied to them).
 
 ### Usage
-Full user documentation is provided in the readme.html included in 
-the zip distribution created by the Maven build process.
+Full user documentation is [available here](https://github.com/KodeMunkie/imagetozxspec/tree/master/doc) and provided as html in the readme.html included in the zip distribution created by the Maven build process. 
+
