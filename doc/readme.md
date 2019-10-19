@@ -43,8 +43,7 @@ For information on advanced features read on...
 Open the control panel "Options - Control" panel or click the gear icon.
 
 #### Image Export (.png/.jpg) 
-This is the file format to be used for regular (PC) image export.
-PNG and JPEG are currently the only true image formats available. PNG has 
+This is the file format to be used for regular (PC) image export. PNG has 
 one benefit over JPEG format in that it does not suffer image degradation
 so it has been chosen as the default image format. Enabling the 256x192 
 resize option will force all images to be reduced to this size, 
@@ -59,16 +58,14 @@ to use, but removes attribute flicker commonly seen during video playback.
 GigaScreen USR 0 is also 128K only but is intended specifically to view the
 GigaScreen 102 colour images and is not compatible with video or regular
 Spectrum images. 
-WARNING: GigaScreen images display with this loader flicker *a lot* and the
+WARNING: GigaScreen images displayed with this loader flicker *a lot* and the
 image display quality is poor owing to flashing two images quickly using BASIC. 
 A hardware or machine code viewer will display GigaScreen SCR images more 
 accurately and with a lot less flicker (e.g. the built in viewer in Fatware).
 
 All built-in loaders allow you to specify the frame delay between images 
 showing before the video/slideshow starts on the Spectrum. Alternatively you 
-can add  your own custom loader by choosing the "Custom" droplist option. 
-There are no built-in loaders suitable for GigaScreen palette images so a 
-custom loader must be provided if you want to use GigaScreen files on tape.
+can add  your own custom loader by choosing the "Custom" droplist option.
 See the FAQ note for more information on video support.
 
 #### Showing the Frames Per Second (FPS)
@@ -95,7 +92,7 @@ viewer. Images using this format will automatically be resized to
 * TAP (.tap/tape file) 
 This is for the real enthusiasts. Using this option will convert your
 images to a slideshow, prepared as a ".tap" file suitable for emulators
-or with conversion, real Spectrum hardware. On loading you will be
+or with conversion to audio or DivIDE, real Spectrum hardware. On loading you will be
 presented with a prompt informing you that it is the Image to ZX Spec
 program and that you can choose the delay between images (or frames in
 the case of video) for the slideshow. Images using this format will 
@@ -256,7 +253,7 @@ for light colours but with white.
 The result is that converted images have slightly more contrasting detail (i.e.
 black and white) which significantly improves most images, at the expense of
 colour accuracy. Typically cartoons, bright images, and images with a lot of 
-similars colour benefit the most from this. It also helps reduce Spectrum 
+similar colour benefit the most from this. It also helps reduce Spectrum 
 attribute artifacts.
 
 #### GigaScreen SCR Export Attribute Order
@@ -265,12 +262,9 @@ This option only affects the SCR and Tape GigaScreen export and output
 order certain colours are in; e.g. a pink may be made up of white in screen 1, 
 red in screen 2. The option is intended to reduce artifacts and flicker when
 alternating screens.
-You can choose to order in a number of ways but "Luminosity" is the generally 
+You can choose to order in a number of ways but "Luminosity" is generally 
 the best, "None" is fast and "Intelligent" attempts to group colours. 
-Additionally "Brightness" may reduce flicker, "Contrast" may reduce 
-attribute artifact edges or "Hue" may help reduce artifact edges, like contrast
-but similar colours rather than same colours will be grouped on one screen.
-
+Additionally "Brightness" may reduce flicker, "Contrast" and "Hue" may reduce may help reduce attribute artifact edges.
 
 #### Ordered Dither Intensity
 This determines the extent to which an image will be dithered. The lower the 
@@ -279,7 +273,7 @@ brightness of the image (a side effect).
 
 #### Video Import Engine
 By default Image to ZX Spec's uses HumbleVideo which is fast platform native video
-decoder. However, in case your video format is not supported you can use VLCJ which
+decoder. However, in case your video format is not supported you can use VLCJ that
 uses the VLC application instead.
 Selecting this option will prompt you to locate the VLC folder on your 
 computer. Note that if you are using 64 bit Java you need to use the 64 bit version 
