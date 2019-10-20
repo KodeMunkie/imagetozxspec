@@ -9,5 +9,5 @@ or create retro art posters (images of any size - memory limited - can
 have a Spectrum effect applied to them).
 
 ### Usage
-Full user documentation is [available here](https://github.com/KodeMunkie/imagetozxspec/tree/master/doc) and provided as a readme.html included in the zip distribution. 
+Full user documentation is [available here](https://github.com/KodeMunkie/imagetozxspec/tree/master/doc) and provided as a readme.html included in the [zip distribution](https://github.com/KodeMunkie/imagetozxspec/releases). 
 
