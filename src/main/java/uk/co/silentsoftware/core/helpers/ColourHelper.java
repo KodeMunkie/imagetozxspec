@@ -174,11 +174,11 @@ public final class ColourHelper {
 	 * @param colours the gigascreen colours to search
 	 * @return the difference as a value  greater than or equal to 0
 	 */
-	public static int getClosestColourDistanceForGigascreenColours(int red, int green, int blue, GigaScreenColour[] colours) {
-		int bestMatch = Integer.MAX_VALUE;
+	public static double getClosestColourDistanceForGigascreenColours(int red, int green, int blue, GigaScreenColour[] colours) {
+		double bestMatch = Double.MAX_VALUE;
 		for (GigaScreenColour colour : colours) {
 			final int[] colourSetComps = colour.getGigascreenColourRGB();
-			int diff = Math.abs(red - colourSetComps[0]) + Math.abs(green - colourSetComps[1]) + Math.abs(blue - colourSetComps[2]);
+			double diff = getColorDifferenceCompuphase(red, green, blue, colourSetComps); //Math.abs(red - colourSetComps[0]) + Math.abs(green - colourSetComps[1]) + Math.abs(blue - colourSetComps[2]);
 			bestMatch = Math.min(diff, bestMatch);
 		}
 		return bestMatch;
@@ -216,6 +216,26 @@ public final class ColourHelper {
 	}
 
 	/**
+	 * Calculates the luminosity total for a set of rgb values
+	 * based on the NTSC formula  Y = 0.299*r + 0.587*g + 0.114*b.
+	 *
+	 * @param rgbVals the rgb value sets
+	 * @return the luminosity sum
+	 */
+	public static float luminositySum(int[] rgbVals) {
+		float sum = 0;
+		for (int rgb : rgbVals) {
+			int[] rgbComponents = ColourHelper.intToRgbComponents(rgb);
+			sum += luminosity(rgbComponents[0], rgbComponents[1], rgbComponents[2]);
+		}
+		return sum;
+	}
+
+	public static float luminosity(int red, int green, int blue) {
+		return (float)((0.299 * red) + (0.587 * green) + (0.114 * blue));
+	}
+
+	/**
 	 * Gets the closest colour in the colourset for the provided rgb components
 	 * 
 	 * @param red the red component
@@ -225,17 +245,108 @@ public final class ColourHelper {
 	 * @return the closest colour
 	 */
 	private static int getClosestColour(int red, int green, int blue, int[] colourSet) {
-		int bestMatch = Integer.MAX_VALUE;
+		double bestMatch = Double.MAX_VALUE;
 		Integer closest = null;
 		for (int colour : colourSet) {
 			final int[] colourSetComps = intToRgbComponents(colour);
-			int diff = Math.abs(red - colourSetComps[0]) + Math.abs(green - colourSetComps[1]) + Math.abs(blue - colourSetComps[2]);
+			double diff = getColorDifferenceCompuphase(red, green, blue, colourSetComps);
 			if (diff <= bestMatch) {
 				closest = colour;
 				bestMatch = diff;
 			}
 		}
 		return closest;
+	}
+
+	private static double getColorDifferenceEuclidean(int red, int green, int blue, int[] colourSetComps) {
+		return Math.pow(red - colourSetComps[0], 2d) + Math.pow(green - colourSetComps[1], 2d) + Math.pow(blue - colourSetComps[2], 2d);
+	}
+
+	private static double getColorDifferenceCompuphase(int red, int green, int blue, int[] colourSetComps) {
+		long rmean = ((long) colourSetComps[0] + (long) red) / 2;
+		long r = (long) colourSetComps[0] - (long) red;
+		long g = (long) colourSetComps[1] - (long) green;
+		long b = (long) colourSetComps[2] - (long) blue;
+		return Math.sqrt((((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8));
+	}
+
+	/**
+	 * Computes the difference between two RGB colors by converting them to the L*a*b scale and
+	 * comparing them using the CIE76 algorithm { http://en.wikipedia.org/wiki/Color_difference#CIE76}
+	 */
+	public static double getColorDifferenceCIE76(int r1, int g1, int b1, int r2, int g2, int b2) {
+		int[] lab1 = rgb2lab(r1, g1, b1);
+		int[] lab2 = rgb2lab(r2, g2, b2);
+		return Math.sqrt(Math.pow(lab2[0] - lab1[0], 2) + Math.pow(lab2[1] - lab1[1], 2) + Math.pow(lab2[2] - lab1[2], 2));
+	}
+
+	public static int[] rgb2lab(int R, int G, int B) {
+		//http://www.brucelindbloom.com
+
+		float r, g, b, X, Y, Z, fx, fy, fz, xr, yr, zr;
+		float Ls, as, bs;
+		float eps = 216.f / 24389.f;
+		float k = 24389.f / 27.f;
+
+		float Xr = 0.964221f;  // reference white D50
+		float Yr = 1.0f;
+		float Zr = 0.825211f;
+
+		// RGB to XYZ
+		r = R / 255.f; //R 0..1
+		g = G / 255.f; //G 0..1
+		b = B / 255.f; //B 0..1
+
+		// assuming sRGB (D65)
+		if (r <= 0.04045)
+			r = r / 12;
+		else
+			r = (float) Math.pow((r + 0.055) / 1.055, 2.4);
+
+		if (g <= 0.04045)
+			g = g / 12;
+		else
+			g = (float) Math.pow((g + 0.055) / 1.055, 2.4);
+
+		if (b <= 0.04045)
+			b = b / 12;
+		else
+			b = (float) Math.pow((b + 0.055) / 1.055, 2.4);
+
+
+		X = 0.436052025f * r + 0.385081593f * g + 0.143087414f * b;
+		Y = 0.222491598f * r + 0.71688606f * g + 0.060621486f * b;
+		Z = 0.013929122f * r + 0.097097002f * g + 0.71418547f * b;
+
+		// XYZ to Lab
+		xr = X / Xr;
+		yr = Y / Yr;
+		zr = Z / Zr;
+
+		if (xr > eps)
+			fx = (float) Math.pow(xr, 1 / 3.);
+		else
+			fx = (float) ((k * xr + 16.) / 116.);
+
+		if (yr > eps)
+			fy = (float) Math.pow(yr, 1 / 3.);
+		else
+			fy = (float) ((k * yr + 16.) / 116.);
+
+		if (zr > eps)
+			fz = (float) Math.pow(zr, 1 / 3.);
+		else
+			fz = (float) ((k * zr + 16.) / 116);
+
+		Ls = (116 * fy) - 16;
+		as = 500 * (fx - fy);
+		bs = 200 * (fy - fz);
+
+		int[] lab = new int[3];
+		lab[0] = (int) (2.55 * Ls + .5);
+		lab[1] = (int) (as + .5);
+		lab[2] = (int) (bs + .5);
+		return lab;
 	}
 
 	/**

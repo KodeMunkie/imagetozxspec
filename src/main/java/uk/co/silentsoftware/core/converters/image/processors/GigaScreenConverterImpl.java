@@ -34,6 +34,7 @@ import java.util.*;
 import java.util.List;
 
 import static uk.co.silentsoftware.config.SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE;
+import static uk.co.silentsoftware.core.helpers.ColourHelper.luminositySum;
 
 /**
  * A converter that wraps the GigaScreen logic around a base dithering converter.
@@ -108,10 +109,10 @@ public class GigaScreenConverterImpl implements ImageConverter {
 		for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); y += ATTRIBUTE_BLOCK_SIZE) {			
 			for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= original.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
 				int outRgb[] = original.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, null, 0, ATTRIBUTE_BLOCK_SIZE);				
-				long lowest = Long.MAX_VALUE;
+				double lowest = Double.MAX_VALUE;
 				GigaScreenAttribute chosen = palette[0];
 				for (GigaScreenAttribute combo : palette) {
-					int score = combo.getScoreForAttributeBlock(outRgb);
+					double score = combo.getScoreForAttributeBlock(outRgb);
 					if (score < lowest) {
 						lowest = score;
 						chosen = combo;
@@ -166,22 +167,6 @@ public class GigaScreenConverterImpl implements ImageConverter {
                 }
             }
         }
-    }
-
-    /**
-     * Calculates the luminosity total for a set of rgb values
-     * based on the NTSC formula  Y = 0.299*r + 0.587*g + 0.114*b.
-     *
-     * @param rgbVals the rgb value sets
-     * @return the luminosity sum
-     */
-    private float luminositySum(int[] rgbVals) {
-        float sum = 0;
-        for (int rgb : rgbVals) {
-            int[] rgbComponents = ColourHelper.intToRgbComponents(rgb);
-            sum += (0.299 * rgbComponents[0] + 0.587 * rgbComponents[1] + 0.114 * rgbComponents[2]);
-        }
-        return sum;
     }
 
     /**
