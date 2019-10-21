@@ -55,7 +55,6 @@ public class OrderedDitherConverterImpl implements ImageConverter {
 	@Override
 	public ResultImage[] convert(final BufferedImage original) {
 
-		OptionsObject oo = OptionsObject.getInstance();
 		BufferedImage output = ImageHelper.copyImage(original);
 		int xMax = ditherStrategy.getMatrixWidth();
 		int yMax = ditherStrategy.getMatrixHeight();

@@ -178,7 +178,7 @@ public final class ColourHelper {
 		double bestMatch = Double.MAX_VALUE;
 		for (GigaScreenColour colour : colours) {
 			final int[] colourSetComps = colour.getGigascreenColourRGB();
-			double diff = getColorDifferenceCompuphase(red, green, blue, colourSetComps); //Math.abs(red - colourSetComps[0]) + Math.abs(green - colourSetComps[1]) + Math.abs(blue - colourSetComps[2]);
+			double diff = getColourDifference(red, green, blue, colourSetComps); //Math.abs(red - colourSetComps[0]) + Math.abs(green - colourSetComps[1]) + Math.abs(blue - colourSetComps[2]);
 			bestMatch = Math.min(diff, bestMatch);
 		}
 		return bestMatch;
@@ -249,8 +249,8 @@ public final class ColourHelper {
 		Integer closest = null;
 		for (int colour : colourSet) {
 			final int[] colourSetComps = intToRgbComponents(colour);
-			double diff = getColorDifferenceCompuphase(red, green, blue, colourSetComps);
-			if (diff <= bestMatch) {
+			double diff = getColourDifference(red, green, blue, colourSetComps);
+			if (diff < bestMatch) {
 				closest = colour;
 				bestMatch = diff;
 			}
@@ -258,11 +258,16 @@ public final class ColourHelper {
 		return closest;
 	}
 
-	private static double getColorDifferenceEuclidean(int red, int green, int blue, int[] colourSetComps) {
+	private static double getColourDifference(int red, int green, int blue, int[] colourSetComps) {
+		// TODO: Use OptionsObject
+		return getColourDifferenceCompuphase(red, green, blue, colourSetComps);
+	}
+
+	private static double getColourDifferenceEuclidean(int red, int green, int blue, int[] colourSetComps) {
 		return Math.pow(red - colourSetComps[0], 2d) + Math.pow(green - colourSetComps[1], 2d) + Math.pow(blue - colourSetComps[2], 2d);
 	}
 
-	private static double getColorDifferenceCompuphase(int red, int green, int blue, int[] colourSetComps) {
+	private static double getColourDifferenceCompuphase(int red, int green, int blue, int[] colourSetComps) {
 		long rmean = ((long) colourSetComps[0] + (long) red) / 2;
 		long r = (long) colourSetComps[0] - (long) red;
 		long g = (long) colourSetComps[1] - (long) green;
@@ -274,9 +279,9 @@ public final class ColourHelper {
 	 * Computes the difference between two RGB colors by converting them to the L*a*b scale and
 	 * comparing them using the CIE76 algorithm { http://en.wikipedia.org/wiki/Color_difference#CIE76}
 	 */
-	public static double getColorDifferenceCIE76(int r1, int g1, int b1, int r2, int g2, int b2) {
+	public static double getColourDifferenceCIE76(int r1, int g1, int b1, int[] colourSetComps) {
 		int[] lab1 = rgb2lab(r1, g1, b1);
-		int[] lab2 = rgb2lab(r2, g2, b2);
+		int[] lab2 = rgb2lab(colourSetComps[0], colourSetComps[1], colourSetComps[2]);
 		return Math.sqrt(Math.pow(lab2[0] - lab1[0], 2) + Math.pow(lab2[1] - lab1[1], 2) + Math.pow(lab2[2] - lab1[2], 2));
 	}
 
@@ -526,7 +531,7 @@ public final class ColourHelper {
 	 * @param high the high value
 	 * @return the ranged valued
 	 */
-	private static float correctRange(float value, float low, float high) {
+	public static float correctRange(float value, float low, float high) {
 		if (value < low) {
 			return low;
 		}
@@ -564,7 +569,7 @@ public final class ColourHelper {
 	 * @param component the component to restrict
 	 * @return the corrected component
 	 */
-	private static int correctRange(int component) {
+	public static int correctRange(int component) {
 		return ColourHelper.correctRange(component, 0, MAXIMUM_COMPONENT_VALUE);
 	}
 
