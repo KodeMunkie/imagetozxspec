@@ -39,21 +39,17 @@ public class MonochromePaletteStrategy implements ColourChoiceStrategy {
 	}
 
 	@Override
-	public int getClosestColour(int r, int g, int b) {
-		// Get OptionsObject on access to prevent circular dependency
-		OptionsObject oo = OptionsObject.getInstance();
-		return ColourHelper.getMonochromeColour(r, g, b,
-				SPECTRUM_COLOURS_BRIGHT[oo.getMonochromeInkIndex()],
-				SPECTRUM_COLOURS_BRIGHT[oo.getMonochromePaperIndex()]);
-	}
-
-	@Override
 	public int getClosestColour(int rgb) {
 		// Get OptionsObject on access to prevent circular dependency
 		OptionsObject oo = OptionsObject.getInstance();
 		return ColourHelper.getMonochromeColour(rgb,
 				SPECTRUM_COLOURS_BRIGHT[oo.getMonochromeInkIndex()],
 				SPECTRUM_COLOURS_BRIGHT[oo.getMonochromePaperIndex()]);
+	}
+
+	@Override
+	public int[] getPalette() {
+		return SPECTRUM_COLOURS_BRIGHT;
 	}
 
 	@Override

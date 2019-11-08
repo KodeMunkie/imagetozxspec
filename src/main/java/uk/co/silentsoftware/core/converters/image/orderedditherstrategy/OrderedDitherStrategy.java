@@ -29,19 +29,19 @@ public interface OrderedDitherStrategy extends DitherStrategy {
 	 * (just 1 dimension)
 	 * @return the width
 	 */
-	public int getMatrixWidth();
+	int getMatrixWidth();
 	
 	/**
 	 * The matrix height of this dither
 	 * (just 1 dimension)
 	 * @return the height
 	 */
-	public int getMatrixHeight();
+	int getMatrixHeight();
 	
 	/**
 	 * Applies the dither to the set of rgb pixels
 	 * @param outRgb the rgb pixels to apply the dither to
 	 * @return the dither applied to a set of rgb pixels
 	 */
-	public int[] applyDither(int[] outRgb);
+	int[] applyDither(int[] outRgb);
 }

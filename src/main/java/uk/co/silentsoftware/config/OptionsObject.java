@@ -31,6 +31,10 @@ import uk.co.silentsoftware.core.converters.image.orderedditherstrategy.*;
 import uk.co.silentsoftware.core.converters.video.HumbleVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VLCVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VideoImportEngine;
+import uk.co.silentsoftware.core.helpers.colourdifference.ClassicColourDifferenceStrategy;
+import uk.co.silentsoftware.core.helpers.colourdifference.ColourDifferenceStrategy;
+import uk.co.silentsoftware.core.helpers.colourdifference.CompuphaseColourDifferenceStrategy;
+import uk.co.silentsoftware.core.helpers.colourdifference.EuclideanColourDifference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +137,6 @@ public class OptionsObject {
 		orderedDithers.add(new OmegaOrderedDitherStrategy()); 
 		orderedDithers.add(new BayerFourByFourDitherStrategy());
 		orderedDithers.add(new BayerEightByEightDitherStrategy());
-		orderedDithers.add(new LightnessOrderedDitherStrategy());
 		orderedDithers.add(new MagicSquareDitherStrategy());
 		orderedDithers.add(new NasikMagicSquareDitherStrategy());
 	}
@@ -233,6 +236,14 @@ public class OptionsObject {
 		gigaScreenAttributeModes.add(new GigaScreenBrightPaletteStrategy());
 		gigaScreenAttributeModes.add(new GigaScreenMixedPaletteStrategy());
 	};
+
+	private final List<ColourDifferenceStrategy> colourDifferenceModes;
+	{
+		colourDifferenceModes = new ArrayList<>();
+		colourDifferenceModes.add(new CompuphaseColourDifferenceStrategy());
+		colourDifferenceModes.add(new ClassicColourDifferenceStrategy());
+		colourDifferenceModes.add(new EuclideanColourDifference());
+	}
 
 	/**
 	 * Currently selected gigascreen attribute mode
@@ -384,6 +395,12 @@ public class OptionsObject {
 	 */
 	@PreferencesField
 	private volatile boolean preferDetail = true;
+
+	/**
+	 * Algorithm to compare colour likeness
+	 */
+	@PreferencesField
+	private volatile int colourDifferenceStrategy = 0;
 
 	/**
 	 * Singleton instance of this class
@@ -728,5 +745,17 @@ public class OptionsObject {
 
 	public void setGigaScreenPaletteOrder(GigaScreenPaletteOrder gigaScreenAttributeOrderingOption) {
 		this.gigaScreenPaletteOrder = gigaScreenAttributeOrderingOption.name();
+	}
+
+	public ColourDifferenceStrategy getColourDifferenceMode() {
+		return colourDifferenceModes.get(colourDifferenceStrategy);
+	}
+
+	public ColourDifferenceStrategy[] getColourDifferences() {
+		return colourDifferenceModes.toArray(new ColourDifferenceStrategy[0]);
+	}
+
+	public void setColourDifferenceStrategy(ColourDifferenceStrategy colourDifferenceStrategy) {
+		this.colourDifferenceStrategy =  colourDifferenceModes.indexOf(colourDifferenceStrategy);
 	}
 }

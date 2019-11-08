@@ -18,15 +18,15 @@ package uk.co.silentsoftware.core.converters.image.orderedditherstrategy;
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 
 /**
- * Traditional "magic square" 4x4 dither algorithm whose rows and columns total 100 
+ * Traditional "magic square" 4x4 dither algorithm whose sum of rows and columns are equal
  */
 public class MagicSquareDitherStrategy extends AbstractOrderedDitherStrategy implements OrderedDitherStrategy {
 
 	private static final int[] COEFFS = new int[]{
-		0,60,40,20,
-		20,0,60,40,
-		40,20,0,60,
-		60,40,20,0
+		0,15,10,5,
+		5,0,15,10,
+		10,5,0,15,
+		15,10,5,0
 	};
 	
 	/*

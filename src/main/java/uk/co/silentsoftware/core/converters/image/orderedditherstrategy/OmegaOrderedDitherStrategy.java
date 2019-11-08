@@ -24,8 +24,8 @@ import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 public class OmegaOrderedDitherStrategy extends AbstractOrderedDitherStrategy implements OrderedDitherStrategy {
 
 	private static final int[] COEFFS = new int[]{ 
-		0,48,
-		48,0
+		0,1,
+		1,0
 	};
 	
 	/*

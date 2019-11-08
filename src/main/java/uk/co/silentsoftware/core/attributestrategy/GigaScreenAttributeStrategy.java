@@ -35,5 +35,5 @@ public interface GigaScreenAttributeStrategy {
 	 * 
 	 * @return the gigascreenattribute's palette
 	 */
-	public GigaScreenAttribute[] getPalette();
+	GigaScreenAttribute[] getPalette();
 }

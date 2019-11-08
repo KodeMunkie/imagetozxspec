@@ -25,6 +25,7 @@ import uk.co.silentsoftware.core.colourstrategy.ColourChoiceStrategy;
 import uk.co.silentsoftware.core.converters.image.DitherStrategy;
 import uk.co.silentsoftware.core.converters.video.VLCVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VideoImportEngine;
+import uk.co.silentsoftware.core.helpers.colourdifference.ColourDifferenceStrategy;
 import uk.co.silentsoftware.ui.listener.DitherChangedListener;
 
 import javax.swing.*;
@@ -264,20 +265,15 @@ class PreferencesDialog extends JFrame  {
         });
 		panel.add(label);
 		panel.add(paletteOptions);
-		label = new JLabel(getCaption("adv_dither_intensity"), JLabel.CENTER);
-		final JSlider ditherSlider = new JSlider(1, 10);
-		ditherSlider.setMajorTickSpacing(1);
-		ditherSlider.setPaintTicks(true);
-		ditherSlider.setPaintLabels(true);
-		ditherSlider.setSnapToTicks(true);
-		ditherSlider.setLabelTable(ditherSlider.createStandardLabels(1));
-		ditherSlider.setValue(11-oo.getOrderedDitherIntensity());
-		ditherSlider.addChangeListener(ce -> {
-            oo.setOrderedDitherIntensity(11-ditherSlider.getValue());
-            PreferencesService.save();
-        });
+		label = new JLabel(getCaption("adv_colour_diff"), JLabel.CENTER);
+		final JComboBox<ColourDifferenceStrategy> colourOptions = new JComboBox<>(oo.getColourDifferences());
+		colourOptions.setSelectedItem(oo.getColourDifferenceMode());
+		colourOptions.addActionListener(e -> {
+			oo.setColourDifferenceStrategy((ColourDifferenceStrategy) colourOptions.getSelectedItem());
+			PreferencesService.save();
+		});
 		panel.add(label);
-		panel.add(ditherSlider);
+		panel.add(colourOptions);
 		
 		label = new JLabel(getCaption("adv_video_import_engine"), JLabel.CENTER);
 		final JComboBox<VideoImportEngine> importEngine = new JComboBox<>(oo.getVideoImportEngines());

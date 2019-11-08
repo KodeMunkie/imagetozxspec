@@ -19,6 +19,7 @@ package uk.co.silentsoftware.core.converters.image.processors;
 import uk.co.silentsoftware.config.GigaScreenPaletteOrder;
 import uk.co.silentsoftware.config.OptionsObject;
 import uk.co.silentsoftware.config.SpectrumDefaults;
+import uk.co.silentsoftware.core.colourstrategy.GigaScreenPaletteStrategy;
 import uk.co.silentsoftware.core.converters.image.ResultImage;
 import uk.co.silentsoftware.core.converters.image.ResultImage.ResultImageType;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
@@ -71,7 +72,7 @@ public class GigaScreenConverterImpl implements ImageConverter {
 
         // Algorithm replaces each pixel with the colour from the closest matching
         // 4 colour GigaScreen attribute block.
-        GigaScreenAttribute[][] quad = getGigaScreenAttribute(output);
+        GigaScreenAttribute[][] quad = ((GigaScreenPaletteStrategy)oo.getColourMode()).getGigaScreenAttributes(output, oo.getGigaScreenAttributeStrategy().getPalette());
         GigaScreenAttribute combo = null;
         for (int y = 0; y < output.getHeight(); ++y) {
             for (int x = 0; x < output.getWidth(); ++x) {
@@ -79,7 +80,6 @@ public class GigaScreenConverterImpl implements ImageConverter {
                     combo = quad[x / ATTRIBUTE_BLOCK_SIZE][y / ATTRIBUTE_BLOCK_SIZE];
                 }
                 GigaScreenAttribute.GigaScreenColour c = ColourHelper.getClosestGigaScreenColour(output.getRGB(x, y), combo);
-                output.setRGB(x, y, c.getGigascreenColour());
                 output1.setRGB(x, y, c.getScreen1Colour());
                 output2.setRGB(x, y, c.getScreen2Colour());
             }
@@ -93,36 +93,6 @@ public class GigaScreenConverterImpl implements ImageConverter {
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output1),
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output2)};
     }
-	
-	/**
-	 * Creates a map of the 32x24 Spectrum attribute set for two screens.
-	 * For each attribute block it finds the closest (best fitting) gigascreen
-	 * palette of 4 colours.
-	 * 
-	 * @param original the original image
-	 * @return the giga screen attribute array
-	 */
-	public GigaScreenAttribute[][] getGigaScreenAttribute(BufferedImage original) {
-		OptionsObject oo = OptionsObject.getInstance();
-		GigaScreenAttribute[] palette = oo.getGigaScreenAttributeStrategy().getPalette();
-		GigaScreenAttribute[][] entries = new GigaScreenAttribute[original.getWidth()/ATTRIBUTE_BLOCK_SIZE][original.getHeight()/ATTRIBUTE_BLOCK_SIZE];
-		for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); y += ATTRIBUTE_BLOCK_SIZE) {			
-			for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= original.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
-				int outRgb[] = original.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, null, 0, ATTRIBUTE_BLOCK_SIZE);				
-				double lowest = Double.MAX_VALUE;
-				GigaScreenAttribute chosen = palette[0];
-				for (GigaScreenAttribute combo : palette) {
-					double score = combo.getScoreForAttributeBlock(outRgb);
-					if (score < lowest) {
-						lowest = score;
-						chosen = combo;
-					}
-				}
-				entries[x/ATTRIBUTE_BLOCK_SIZE][y/ATTRIBUTE_BLOCK_SIZE] = chosen;
-			}			
-		}
-		return entries;
-	}
 
     /**
      * Orders attributes by grouping them into 2 colour sets one for each screen

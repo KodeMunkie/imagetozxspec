@@ -23,8 +23,8 @@ import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 public class BayerTwoByTwoOrderedDitherStrategy extends AbstractOrderedDitherStrategy implements OrderedDitherStrategy {
 
 	private static final int[] COEFFS = new int[]{ 
-		0,48,
-		32,16
+		0, 3,
+		2, 1
 	};
 	
 	/*

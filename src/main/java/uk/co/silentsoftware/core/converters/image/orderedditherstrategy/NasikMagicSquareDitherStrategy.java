@@ -26,10 +26,10 @@ import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 public class NasikMagicSquareDitherStrategy extends AbstractOrderedDitherStrategy implements OrderedDitherStrategy {
 
 	private static final int[] COEFFS = new int[]{
-		0,56,12,52,
-		44,20,32,24,
-		48,8,60,4,
-		28,36,16,40
+		0,14,3,13,
+		11,5,8,6,
+		12,2,15,1,
+		7,9,4,10
 	};
 	
 	/*

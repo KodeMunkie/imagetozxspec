@@ -101,7 +101,7 @@ public class GigaScreenAttribute {
 	 * @param attributeBlock the sample block to compare against this attribute
 	 * @return the score in range >= 0
 	 */
-	 double getScoreForAttributeBlock(int[] attributeBlock) {
+	  public double getScoreForAttributeBlock(int[] attributeBlock) {
 		double totalDistance = 0;
 		for (int pixel : attributeBlock) {
 			int[] components = ColourHelper.intToRgbComponents(pixel);
@@ -144,7 +144,7 @@ public class GigaScreenAttribute {
 			return gigascreenColourRGB;
 		}
 
-		int getGigascreenColour() {
+		public int getGigascreenColour() {
 			return gigascreenColour;
 		}
 

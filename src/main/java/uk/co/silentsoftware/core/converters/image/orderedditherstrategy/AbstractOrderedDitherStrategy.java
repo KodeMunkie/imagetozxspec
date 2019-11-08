@@ -23,6 +23,9 @@ import uk.co.silentsoftware.core.converters.image.processors.ImageConverter;
 import uk.co.silentsoftware.core.converters.image.processors.OrderedDitherConverterImpl;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
+import java.awt.*;
+import java.awt.image.ColorModel;
+
 /**
  * Base class for applying an ordered dither strategy
  */
@@ -40,17 +43,14 @@ public abstract class AbstractOrderedDitherStrategy implements OrderedDitherStra
 	public int[] applyDither(int[] rgbStrip) {
 		OptionsObject oo = OptionsObject.getInstance();
 		int[] coeffs = getCoefficients();
-		
-		// Intensity should really be a fraction of the matrix amount
-		// but addition is a faster operation
-		int intensity = oo.getOrderedDitherIntensity();
+		int[] colDist = ColourHelper.getAverageColourDistance(oo.getColourMode().getPalette());
 		for(int i=0; i<rgbStrip.length; i++) {
 			int[] rgb = ColourHelper.intToRgbComponents(rgbStrip[i]);
-			int adjustedCoeff = Math.round((float)coeffs[i]/(float)intensity);
-			int oldRed = (rgb[0]+adjustedCoeff);
-			int oldGreen = (rgb[1]+adjustedCoeff);
-			int oldBlue = (rgb[2]+adjustedCoeff);
-			rgbStrip[i] = oo.getColourMode().getClosestColour(oldRed, oldGreen, oldBlue);
+			float adjustedCoeff = ((float)(coeffs[i])/(float)getCoefficients().length)-0.5f;
+			int oldRed = ColourHelper.correctRange(Math.round(rgb[0]+(colDist[0]*adjustedCoeff)));
+			int oldGreen = ColourHelper.correctRange(Math.round(rgb[1]+(colDist[1]*adjustedCoeff)));
+			int oldBlue = ColourHelper.correctRange(Math.round(rgb[2]+(colDist[2]*adjustedCoeff)));
+			rgbStrip[i] = new Color(oldRed, oldGreen, oldBlue).getRGB();
 		}
 		return rgbStrip;
 	}

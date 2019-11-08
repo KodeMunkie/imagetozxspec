@@ -17,6 +17,8 @@
 package uk.co.silentsoftware.core.colourstrategy;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
+
+import uk.co.silentsoftware.config.SpectrumDefaults;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
 import java.awt.image.BufferedImage;
@@ -41,13 +43,13 @@ public class FullPaletteStrategy implements ColourChoiceStrategy {
 	}
 
 	@Override
-	public int getClosestColour(int r, int g, int b) {
-		return ColourHelper.getClosestSpectrumColour(r, g, b);
+	public int getClosestColour(int rgb) {
+		return ColourHelper.getClosestSpectrumColour(rgb);
 	}
 
 	@Override
-	public int getClosestColour(int rgb) {
-		return ColourHelper.getClosestSpectrumColour(rgb);
+	public int[] getPalette() {
+		return SpectrumDefaults.SPECTRUM_COLOURS_ALL;
 	}
 
 	@Override

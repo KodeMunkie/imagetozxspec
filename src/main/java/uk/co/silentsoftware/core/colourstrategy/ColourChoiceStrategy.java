@@ -37,9 +37,9 @@ public interface ColourChoiceStrategy {
 	 */
 	int chooseBestPaletteMatch(int originalAlphaRgb, int[] mostPopularAlphaRgbColours);
 
-	int getClosestColour(int r, int g, int b);
-
 	int getClosestColour(int rgb);
+
+	int[] getPalette();
 
 	BufferedImage colourAttributes(BufferedImage image);
 

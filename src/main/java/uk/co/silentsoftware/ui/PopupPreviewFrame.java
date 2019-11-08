@@ -38,9 +38,9 @@ import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 public class PopupPreviewFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 
-	private static final int WIDTH = 768;
-	private static final int HEIGHT = 1152;
-	private static final int PANEL_HEIGHT = 640;
+	private static final int WIDTH = 1024;
+	private static final int HEIGHT = 768;
+	private static final int PANEL_HEIGHT = 768;
 	private static BufferedImage previewImage;
 	private static int imagePositionX = 0;
 	private static int imagePositionY = 0;
@@ -73,6 +73,7 @@ public class PopupPreviewFrame extends JFrame {
 	 */
 	private int calculateWidth() {
 		Insets insets = this.getInsets();
+		// bah can't get a button width until rendered so using constant
 		return WIDTH+insets.left+insets.right+scrollPane.getVerticalScrollBar().getSize().width+2;
 	}
 	
@@ -83,7 +84,8 @@ public class PopupPreviewFrame extends JFrame {
 	 */
 	private int calculateHeight() {
 		Insets insets = this.getInsets();
-		return PANEL_HEIGHT+insets.top+insets.bottom;
+		// bah can't get a button height until rendered so using constant
+		return PANEL_HEIGHT+insets.top+insets.bottom+30;
 	}
 	
 	/**
