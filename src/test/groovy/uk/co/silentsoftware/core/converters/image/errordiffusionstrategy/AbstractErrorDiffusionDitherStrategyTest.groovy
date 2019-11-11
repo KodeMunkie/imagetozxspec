@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 class AbstractErrorDiffusionDitherStrategyTest {
 
 	@Before
-	public void setUp() {
+	void setUp() {
 		OptionsObject.getInstance().setPreferDetail(false);
 	}
 	
