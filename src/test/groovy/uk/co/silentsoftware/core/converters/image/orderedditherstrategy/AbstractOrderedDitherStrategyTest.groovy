@@ -50,23 +50,23 @@ class AbstractOrderedDitherStrategyTest {
 	}
 	
 	@Test
-	void testApplyDitherWillFullColour() {
+	void testApplyDitherWithFullColour() {
 		OptionsObject.getInstance().setColourMode(OptionsObject.getInstance().getColourModes()[0])
 		int[] dither = strategy.applyDither(createRgbStrip())
-		Assert.assertArrayEquals([0xFFCDCDCD,0xFF000000,0xFF000000,0xFFCDCDCD] as int[], dither)
+		Assert.assertArrayEquals([0xFF2D2D2D,0xFF000000,0xFF000000,0xFF2D2D2D] as int[], dither)
 	}
 	
 	@Test
 	void testApplyDitherWithGigascreen() {
 		OptionsObject.getInstance().setColourMode(OptionsObject.getInstance().getColourModes()[1])
 		int[] dither = strategy.applyDither(createRgbStrip())
-		Assert.assertArrayEquals([0xFF7F7F7F,0xFF000000,0xFF000000,0xFF7F7F7F] as int[], dither)
+		Assert.assertArrayEquals([0xFF3E3E3E,0xFF000000,0xFF000000,0xFF3E3E3E] as int[], dither)
 	}
 	
 	@Test
 	void testApplyDitherWithMonochrome() {
 		OptionsObject.getInstance().setColourMode(OptionsObject.getInstance().getColourModes()[2])
 		int[] dither = strategy.applyDither(createRgbStrip())
-		Assert.assertArrayEquals([0xFFFFFFFF,0xFF000000,0xFF000000,0xFFFFFFFF] as int[], dither)
+		Assert.assertArrayEquals([0xFF282828,0xFF000000,0xFF000000,0xFF282828] as int[], dither)
 	}
 }

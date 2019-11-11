@@ -27,9 +27,7 @@ class ColourChoiceStrategyTest {
 	void testMonochromePaletteStrategyColour() {
 		ColourChoiceStrategy strategy = new MonochromePaletteStrategy()
 		int result = strategy.chooseBestPaletteMatch(0xFFBBCCDDi, createPopularColours())
-
-		// Just passes back the same value
-		Assert.assertEquals(0xFFBBCCDDi, result)
+		Assert.assertEquals((int)0xFFFFFFFF, result)
 	}
 	
 	@Test(expected=UnsupportedOperationException.class)
