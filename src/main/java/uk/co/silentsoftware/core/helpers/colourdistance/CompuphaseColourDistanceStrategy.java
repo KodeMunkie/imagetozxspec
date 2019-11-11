@@ -1,11 +1,15 @@
-package uk.co.silentsoftware.core.helpers.colourdifference;
+package uk.co.silentsoftware.core.helpers.colourdistance;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 
-public class CompuphaseColourDifferenceStrategy implements ColourDifferenceStrategy {
+/**
+ * Algorithm based on a paper at https://www.compuphase.com/cmetric.htmhttps://www.compuphase.com/cmetric.htm
+ * (Thiadmer Riemersma, CompuPhase)
+ */
+public class CompuphaseColourDistanceStrategy implements ColourDistanceStrategy {
 
     @Override
-    public double getColourDifference(int red, int green, int blue, int[] colourSetComps) {
+    public double getColourDistance(int red, int green, int blue, int[] colourSetComps) {
         long rmean = ((long) colourSetComps[0] + (long) red) / 2;
         long r = (long) colourSetComps[0] - (long) red;
         long g = (long) colourSetComps[1] - (long) green;
@@ -15,6 +19,6 @@ public class CompuphaseColourDifferenceStrategy implements ColourDifferenceStrat
 
     @Override
     public String toString() {
-        return getCaption("adv_colour_diff_compuphase") ;
+        return getCaption("adv_colour_dist_compuphase") ;
     }
 }

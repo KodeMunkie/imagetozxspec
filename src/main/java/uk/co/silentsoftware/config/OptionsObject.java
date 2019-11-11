@@ -31,10 +31,10 @@ import uk.co.silentsoftware.core.converters.image.orderedditherstrategy.*;
 import uk.co.silentsoftware.core.converters.video.HumbleVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VLCVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VideoImportEngine;
-import uk.co.silentsoftware.core.helpers.colourdifference.ClassicColourDifferenceStrategy;
-import uk.co.silentsoftware.core.helpers.colourdifference.ColourDifferenceStrategy;
-import uk.co.silentsoftware.core.helpers.colourdifference.CompuphaseColourDifferenceStrategy;
-import uk.co.silentsoftware.core.helpers.colourdifference.EuclideanColourDifference;
+import uk.co.silentsoftware.core.helpers.colourdistance.ClassicColourDistanceStrategy;
+import uk.co.silentsoftware.core.helpers.colourdistance.ColourDistanceStrategy;
+import uk.co.silentsoftware.core.helpers.colourdistance.CompuphaseColourDistanceStrategy;
+import uk.co.silentsoftware.core.helpers.colourdistance.EuclideanColourDistance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -237,12 +237,12 @@ public class OptionsObject {
 		gigaScreenAttributeModes.add(new GigaScreenMixedPaletteStrategy());
 	};
 
-	private final List<ColourDifferenceStrategy> colourDifferenceModes;
+	private final List<ColourDistanceStrategy> colourDistancesModes;
 	{
-		colourDifferenceModes = new ArrayList<>();
-		colourDifferenceModes.add(new CompuphaseColourDifferenceStrategy());
-		colourDifferenceModes.add(new ClassicColourDifferenceStrategy());
-		colourDifferenceModes.add(new EuclideanColourDifference());
+		colourDistancesModes = new ArrayList<>();
+		colourDistancesModes.add(new CompuphaseColourDistanceStrategy());
+		colourDistancesModes.add(new ClassicColourDistanceStrategy());
+		colourDistancesModes.add(new EuclideanColourDistance());
 	}
 
 	/**
@@ -400,7 +400,7 @@ public class OptionsObject {
 	 * Algorithm to compare colour likeness
 	 */
 	@PreferencesField
-	private volatile int colourDifferenceStrategy = 0;
+	private volatile int colourDistanceStrategy = 0;
 
 	/**
 	 * Singleton instance of this class
@@ -747,15 +747,15 @@ public class OptionsObject {
 		this.gigaScreenPaletteOrder = gigaScreenAttributeOrderingOption.name();
 	}
 
-	public ColourDifferenceStrategy getColourDifferenceMode() {
-		return colourDifferenceModes.get(colourDifferenceStrategy);
+	public ColourDistanceStrategy getColourDistanceMode() {
+		return colourDistancesModes.get(colourDistanceStrategy);
 	}
 
-	public ColourDifferenceStrategy[] getColourDifferences() {
-		return colourDifferenceModes.toArray(new ColourDifferenceStrategy[0]);
+	public ColourDistanceStrategy[] getColourDistances() {
+		return colourDistancesModes.toArray(new ColourDistanceStrategy[0]);
 	}
 
-	public void setColourDifferenceStrategy(ColourDifferenceStrategy colourDifferenceStrategy) {
-		this.colourDifferenceStrategy =  colourDifferenceModes.indexOf(colourDifferenceStrategy);
+	public void setColourDistanceStrategy(ColourDistanceStrategy colourDistanceStrategy) {
+		this.colourDistanceStrategy =  colourDistancesModes.indexOf(colourDistanceStrategy);
 	}
 }

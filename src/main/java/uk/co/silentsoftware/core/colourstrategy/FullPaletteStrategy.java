@@ -38,12 +38,12 @@ public class FullPaletteStrategy implements ColourChoiceStrategy {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int chooseBestPaletteMatch(int originalAlphaRgb, int[] mostPopularRgbColours) {
-		return ColourHelper.getClosestColour(originalAlphaRgb, mostPopularRgbColours);
+	public int chooseBestPaletteMatch(int originalRgb, int[] mostPopularRgbColours) {
+		return ColourHelper.getClosestColour(originalRgb, mostPopularRgbColours);
 	}
 
 	@Override
-	public int getClosestColour(int rgb) {
+	public int chooseBestPaletteMatch(int rgb) {
 		return ColourHelper.getClosestSpectrumColour(rgb);
 	}
 

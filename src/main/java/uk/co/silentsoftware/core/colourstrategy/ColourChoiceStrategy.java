@@ -27,17 +27,17 @@ public interface ColourChoiceStrategy {
 	 * Method to return the RGB int colour (Spectrum colour) that should be
 	 * used for a given pixel based on the Spectrum colours
 	 * passed in as mostPopularColour and secondMostPopularColour.
-	 * originalAlphaRgb is either the original pixel colour or
+	 * originalRgb is either the original pixel colour or
 	 * part converted colour (e.g. a pixel that has already undergone
 	 * colour processing). 
 	 * 
-	 * @param originalAlphaRgb the source rgb value
-	 * @param mostPopularAlphaRgbColours the rgb values from which to choose the closest match
+	 * @param originalRgb the source rgb value
+	 * @param mostPopularRgbColours the rgb values from which to choose the closest match
 	 * @return the closest colour from the most popular array
 	 */
-	int chooseBestPaletteMatch(int originalAlphaRgb, int[] mostPopularAlphaRgbColours);
+	int chooseBestPaletteMatch(int originalRgb, int[] mostPopularRgbColours);
 
-	int getClosestColour(int rgb);
+	int chooseBestPaletteMatch(int rgb);
 
 	int[] getPalette();
 

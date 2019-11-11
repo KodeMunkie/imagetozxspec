@@ -32,7 +32,7 @@ import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 import static uk.co.silentsoftware.config.SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE;
 
 /**
- * Marker class for the GigaScreen palette.
+ * GigaScreen palette strategy
  */
 public class GigaScreenPaletteStrategy implements ColourChoiceStrategy {
 
@@ -49,12 +49,12 @@ public class GigaScreenPaletteStrategy implements ColourChoiceStrategy {
 	 * If this method is called then the wrong processor implementation is being used. 
 	 */
 	@Override
-	public int chooseBestPaletteMatch(int originalAlphaRgb, int[] mostPopularAlphaRgbColours) {
+	public int chooseBestPaletteMatch(int originalRgb, int[] mostPopularRgbColours) {
 		throw new UnsupportedOperationException("GigaScreen palette colouring cannot be applied to dither image processors - this is a placeholder class to allow identification during getClosestColour conversions for the GigaScreenConverter.");
 	}
 
 	@Override
-	public int getClosestColour(int rgb) {
+	public int chooseBestPaletteMatch(int rgb) {
 		return ColourHelper.getClosestGigascreenColour(rgb);
 	}
 

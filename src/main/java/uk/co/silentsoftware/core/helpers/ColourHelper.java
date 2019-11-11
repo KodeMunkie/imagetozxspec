@@ -16,18 +16,6 @@
  */
 package uk.co.silentsoftware.core.helpers;
 
-import static uk.co.silentsoftware.config.SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE;
-
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.awt.image.RescaleOp;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import uk.co.silentsoftware.config.OptionsObject;
@@ -36,6 +24,15 @@ import uk.co.silentsoftware.core.attributestrategy.GigaScreenAttributeStrategy;
 import uk.co.silentsoftware.core.colourstrategy.ColourChoiceStrategy;
 import uk.co.silentsoftware.core.converters.image.processors.GigaScreenAttribute;
 import uk.co.silentsoftware.core.converters.image.processors.GigaScreenAttribute.GigaScreenColour;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+import java.util.List;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static uk.co.silentsoftware.config.SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE;
 /**
  * Utility class to provide common colour functionality
  */
@@ -47,8 +44,9 @@ public final class ColourHelper {
 
 	private static final int CACHE_TIME_SECONDS = 10;
 
-
 	private static final Cache<String, GigaScreenAttribute.GigaScreenColour> CACHE = Caffeine.newBuilder().expireAfterAccess(CACHE_TIME_SECONDS, TimeUnit.SECONDS).build();
+
+	private static final Cache<String, int[]> AVERAGE_CACHE = Caffeine.newBuilder().expireAfterAccess(CACHE_TIME_SECONDS, TimeUnit.SECONDS).build();
 
 
 	/**
@@ -174,8 +172,8 @@ public final class ColourHelper {
 	public static double getClosestColourDistanceForGigascreenColours(int red, int green, int blue, GigaScreenColour[] colours) {
 		double bestMatch = Double.MAX_VALUE;
 		for (GigaScreenColour colour : colours) {
-			final int[] colourSetComps = colour.getGigascreenColourRGB();
-			double diff = OptionsObject.getInstance().getColourDifferenceMode().getColourDifference(red, green, blue, colourSetComps);
+			final int[] paletteComps = colour.getGigascreenColourRGB();
+			double diff = OptionsObject.getInstance().getColourDistanceMode().getColourDistance(red, green, blue, paletteComps);
 			bestMatch = Math.min(diff, bestMatch);
 		}
 		return bestMatch;
@@ -189,7 +187,7 @@ public final class ColourHelper {
 	 * @return the closest matching giga screen colour
 	 */
 	public static GigaScreenAttribute.GigaScreenColour getClosestGigaScreenColour(int rgb, GigaScreenAttribute colourSet) {
-		String key = getKey(rgb, colourSet, OptionsObject.getInstance().getGigaScreenAttributeStrategy());
+		String key = getClosestKey(rgb, colourSet, OptionsObject.getInstance().getGigaScreenAttributeStrategy());
 		GigaScreenAttribute.GigaScreenColour cachedColour = CACHE.getIfPresent(key);
 		if (cachedColour != null) {
 			return cachedColour;
@@ -201,7 +199,7 @@ public final class ColourHelper {
 		for (int paletteIndex = 0; paletteIndex < palette.length; ++paletteIndex) {
 			int colour = palette[paletteIndex];
 			final int[] colourSetComps = ColourHelper.intToRgbComponents(colour);
-			double diff = OptionsObject.getInstance().getColourDifferenceMode().getColourDifference(comps[0], comps[1], comps[2], colourSetComps);
+			double diff = OptionsObject.getInstance().getColourDistanceMode().getColourDistance(comps[0], comps[1], comps[2], colourSetComps);
 			if (diff < bestMatch) {
 				closestMatchPaletteIndex = paletteIndex;
 				bestMatch = diff;
@@ -212,7 +210,11 @@ public final class ColourHelper {
 		return colour;
 	}
 
-	private static String getKey(int rgb, GigaScreenAttribute attribute, GigaScreenAttributeStrategy attributeStrategy) {
+	private static String getAverageKey(int[] palette) {
+		return "pal"+Arrays.hashCode(palette);
+	}
+
+	private static String getClosestKey(int rgb, GigaScreenAttribute attribute, GigaScreenAttributeStrategy attributeStrategy) {
 		return rgb+"-"+attribute.hashCode()+"-"+attributeStrategy.hashCode();
 	}
 
@@ -239,11 +241,21 @@ public final class ColourHelper {
 		return sum;
 	}
 
-	public static float luminosity(int red, int green, int blue) {
+	private static float luminosity(int red, int green, int blue) {
 		return (float)((0.299 * red) + (0.587 * green) + (0.114 * blue));
 	}
 
+	/**
+	 * Calculates the average distance between colour components in the given palette
+	 * @param palette to calculate the average distance from
+	 * @return the rgb component average distances
+	 */
 	public static int[] getAverageColourDistance(int[] palette) {
+		String key = getAverageKey(palette);
+		int[] result = AVERAGE_CACHE.getIfPresent(key);
+		if (result != null) {
+			return result;
+		}
 		int rollingAverageRed = 0;
 		int rollingAverageGreen = 0;
 		int rollingAverageBlue = 0;
@@ -266,7 +278,9 @@ public final class ColourHelper {
 		rollingAverageRed = Math.round((float)rollingAverageRed/(float)(palette.length*palette.length));
 		rollingAverageGreen = Math.round((float)rollingAverageGreen/(float)(palette.length*palette.length));
 		rollingAverageBlue = Math.round((float)rollingAverageBlue/(float)(palette.length*palette.length));
-		return new int[]{rollingAverageRed, rollingAverageGreen, rollingAverageBlue};
+		result = new int[]{rollingAverageRed, rollingAverageGreen, rollingAverageBlue};
+		AVERAGE_CACHE.put(key, result);
+		return result;
 	}
 
 	/**
@@ -283,7 +297,7 @@ public final class ColourHelper {
 		Integer closest = null;
 		for (int colour : colourSet) {
 			final int[] colourSetComps = intToRgbComponents(colour);
-			double diff = OptionsObject.getInstance().getColourDifferenceMode().getColourDifference(red, green, blue, colourSetComps);
+			double diff = OptionsObject.getInstance().getColourDistanceMode().getColourDistance(red, green, blue, colourSetComps);
 			if (diff < bestMatch) {
 				closest = colour;
 				bestMatch = diff;
@@ -509,54 +523,6 @@ public final class ColourHelper {
 	 */
 	public static int correctRange(int component) {
 		return ColourHelper.correctRange(component, 0, MAXIMUM_COMPONENT_VALUE);
-	}
-
-	/**
-	 * Determines whether a pixel is closer to black (than white)
-	 * 
-	 * @param red the red component
-	 * @param green the green component
-	 * @param blue the blue component
-	 * @return whether this component is closer to black than white
-	 */
-	private static boolean isBlack(int red, int green, int blue) {
-		int threshold = OptionsObject.getInstance().getBlackThreshold();
-		return red < threshold && green < threshold && blue < threshold;
-	}
-
-	/**
-	 * Based on the darkness of the pixel colour determines whether a pixel is
-	 * ink or paper and returns that colour. Used for converting colour to
-	 * monochrome based on whether a pixel can be considered black using the
-	 * isBlack threshold.
-	 * 
-	 * @param rgb the rgb colour to get the monochrome colour from
-	 * @param ink the spectrum ink colour
-	 * @param paper the spectrum paper colour
-	 * @return the ink colour if black, otherwise paper colour
-	 */
-	public static int getMonochromeColour(int rgb, int ink, int paper) {
-		int[] comps = intToRgbComponents(rgb);
-		return getMonochromeColour(comps[0], comps[1], comps[2], ink, paper);
-	}
-
-	/**
-	 * Based on the darkness of the pixel colour determines whether a pixel is
-	 * ink or paper and returns that colour. Used for converting colour to
-	 * monochrome based on whether a pixel can be considered black using the
-	 * isBlack threshold.
-	 * 
-	 * @param red the red component
-	 * @param green the green component
-	 * @param blue the blue component
-	 * @param ink the spectrum ink colour
-	 * @param paper the spectrum paper colour
-	 * @return the ink colour if black, otherwise paper colour
-	 */
-	public static int getMonochromeColour(int red, int green, int blue, int ink, int paper) {
-		if (isBlack(red, green, blue))
-			return ink;
-		return paper;
 	}
 
 	/**

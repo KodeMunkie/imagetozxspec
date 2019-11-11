@@ -21,18 +21,12 @@ import org.slf4j.LoggerFactory;
 import uk.co.silentsoftware.config.OptionsObject;
 import uk.co.silentsoftware.config.SpectrumDefaults;
 import uk.co.silentsoftware.core.colourstrategy.ColourChoiceStrategy;
-import uk.co.silentsoftware.core.colourstrategy.FullPaletteStrategy;
-import uk.co.silentsoftware.core.colourstrategy.GigaScreenPaletteStrategy;
-import uk.co.silentsoftware.core.colourstrategy.MonochromePaletteStrategy;
 import uk.co.silentsoftware.core.converters.image.ResultImage;
 import uk.co.silentsoftware.core.converters.image.ResultImage.ResultImageType;
 import uk.co.silentsoftware.core.converters.image.errordiffusionstrategy.ErrorDiffusionDitherStrategy;
-import uk.co.silentsoftware.core.helpers.ColourHelper;
 import uk.co.silentsoftware.core.helpers.ImageHelper;
 
 import java.awt.image.BufferedImage;
-
-import static uk.co.silentsoftware.config.SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT;
 
 /**
  * An error diffusion dithering converter
@@ -108,7 +102,7 @@ public class ErrorDiffusionConverterImpl implements ImageConverter {
 	 */
 	private void processPixel(BufferedImage output,  ColourChoiceStrategy colourMode, ErrorDiffusionDitherStrategy edds, int x, int y, Integer boundX, Integer boundY) {
 		int oldPixel = output.getRGB(x, y);
-		int newPixel = colourMode.getClosestColour(oldPixel);
+		int newPixel = colourMode.chooseBestPaletteMatch(oldPixel);
 		output.setRGB(x, y, newPixel);
 		edds.distributeError(output, oldPixel, newPixel, x, y, boundX, boundY);
 	}

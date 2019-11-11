@@ -25,7 +25,7 @@ import uk.co.silentsoftware.core.colourstrategy.ColourChoiceStrategy;
 import uk.co.silentsoftware.core.converters.image.DitherStrategy;
 import uk.co.silentsoftware.core.converters.video.VLCVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VideoImportEngine;
-import uk.co.silentsoftware.core.helpers.colourdifference.ColourDifferenceStrategy;
+import uk.co.silentsoftware.core.helpers.colourdistance.ColourDistanceStrategy;
 import uk.co.silentsoftware.ui.listener.DitherChangedListener;
 
 import javax.swing.*;
@@ -265,11 +265,11 @@ class PreferencesDialog extends JFrame  {
         });
 		panel.add(label);
 		panel.add(paletteOptions);
-		label = new JLabel(getCaption("adv_colour_diff"), JLabel.CENTER);
-		final JComboBox<ColourDifferenceStrategy> colourOptions = new JComboBox<>(oo.getColourDifferences());
-		colourOptions.setSelectedItem(oo.getColourDifferenceMode());
+		label = new JLabel(getCaption("adv_colour_dist"), JLabel.CENTER);
+		final JComboBox<ColourDistanceStrategy> colourOptions = new JComboBox<>(oo.getColourDistances());
+		colourOptions.setSelectedItem(oo.getColourDistanceMode());
 		colourOptions.addActionListener(e -> {
-			oo.setColourDifferenceStrategy((ColourDifferenceStrategy) colourOptions.getSelectedItem());
+			oo.setColourDistanceStrategy((ColourDistanceStrategy) colourOptions.getSelectedItem());
 			PreferencesService.save();
 		});
 		panel.add(label);

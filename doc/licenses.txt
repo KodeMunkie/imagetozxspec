@@ -27,3 +27,6 @@ https://www.apache.org/
 http://projects.spring.io/spring-framework/
 https://github.com/conversant/disruptor
 http://www.magicwerk.org/page-collections-overview.html
+
+Compuphase Colour Distance Algorithm
+https://creativecommons.org/licenses/by-sa/3.0/legalcode.txt
