@@ -391,12 +391,6 @@ public class OptionsObject {
 	private volatile boolean constrainedErrorDiffusion = false;
 
 	/**
-	 * Whether to enhance the details using black instead of colour
-	 */
-	@PreferencesField
-	private volatile boolean preferDetail = true;
-
-	/**
 	 * Algorithm to compare colour likeness
 	 */
 	@PreferencesField
@@ -705,14 +699,6 @@ public class OptionsObject {
 
 	public VideoImportEngine[] getVideoImportEngines() {
 		return videoImportEngines.toArray(new VideoImportEngine[0]);
-	}
-
-	public boolean getPreferDetail() {
-		return preferDetail;
-	}
-
-	public void setPreferDetail(boolean preferDetail) {
-		this.preferDetail = preferDetail;
 	}
 
 	public String getPathToVideoEngineLibrary() {

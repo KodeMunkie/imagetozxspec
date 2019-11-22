@@ -36,8 +36,8 @@ public class ErrorDiffusionConverterImpl implements ImageConverter {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private OptionsObject oo = OptionsObject.getInstance();
-	private ErrorDiffusionDitherStrategy ditherStrategy = null;
-	private ColourChoiceStrategy colourChoiceStrategy = null;
+	private ErrorDiffusionDitherStrategy ditherStrategy ;
+	private ColourChoiceStrategy colourChoiceStrategy;
 	private boolean drawStrategyLabel = false;
 
 	public ErrorDiffusionConverterImpl(ErrorDiffusionDitherStrategy ditherStrategy, ColourChoiceStrategy colourChoiceStrategy) {

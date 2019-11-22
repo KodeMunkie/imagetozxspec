@@ -55,114 +55,44 @@ public final class ColourHelper {
 	private ColourHelper(){}
 
 	/**
-	 * Retrieves the spectrum colour most like the provided rgb colour
+	 * Gets the closest colour in the mostPopularRgbColours for the provided rgb components
 	 *
-	 * @param rgb the colour to get the spectrum colour for
-	 * @return the spectrum colour
+	 * @param originalAlphaRgb the original rgb to find the closest colour for
+	 * @return the closest colour
 	 */
-	public static int getClosestSpectrumColour(int rgb) {
-		return getClosestColourWithDetail(rgb, SpectrumDefaults.SPECTRUM_COLOURS_ALL);
+	public static int getClosestColour(int originalAlphaRgb, int[] colourSet) {
+
+		// Break the colours into their RGB components
+		int[] originalRgbComps = ColourHelper.intToRgbComponents(originalAlphaRgb);
+		return ColourHelper.getClosestColour(originalRgbComps[0], originalRgbComps[1], originalRgbComps[2], colourSet);
 	}
 
 	/**
-	 * Retrieves the spectrum colour most like the provided rgb colour
-	 *
-	 * @param red the red component to get the spectrum colour for
-	 * @param green the green component to get the spectrum colour for
-	 * @param blue the blue component to get the spectrum colour for
-	 * @return the spectrum colour
-	 */
-	public static int getClosestSpectrumColour(int red, int green, int blue) {
-		return getClosestColourWithDetail(red, green, blue, SpectrumDefaults.SPECTRUM_COLOURS_ALL, OptionsObject.getInstance().getPreferDetail());
-	}
-
-	/**
-	 * Retrieves the spectrum bright colour most like the provided rgb colour
-	 * 
-	 * @param rgb the colour to get the spectrum colour for
-	 * @return the spectrum bright colour
-	 */
-	public static int getClosestBrightSpectrumColour(int rgb) {
-		return getClosestColourWithDetail(rgb, SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT);
-	}
-
-	/**
-	 * Retrieves the spectrum half bright colour most like the provided rgb
-	 * colour
-	 * 
-	 * @param rgb the colour to get the spectrum colour for
-	 * @return the spectrum half bright colour
-	 */
-	public static int getClosestHalfBrightSpectrumColour(int rgb) {
-		return getClosestColourWithDetail(rgb, SpectrumDefaults.SPECTRUM_COLOURS_HALF_BRIGHT);
-	}
-
-	/**
-	 * Retrieves the reduced set spectrum half bright colour most like the
-	 * provided rgb colour
-	 * 
-	 * @param rgb the colour to get the spectrum colour for
-	 * @return the spectrum reduced set colour
-	 */
-	public static int getClosestReducedHalfBrightSpectrumColour(int rgb) {
-		return getClosestColourWithDetail(rgb, SpectrumDefaults.SPECTRUM_COLOURS_REDUCED_HALF_BRIGHT);
-	}
-
-	/**
-	 * Retrieves the Gigascreen colour most like the provided rgb colour
-	 *
-	 * @param rgb the colour to get the gigascreen colour for
-	 * @return the gigascreen colour
-	 */
-	public static int getClosestGigascreenColour(int rgb) {
-		return getClosestColourWithDetail(rgb, SpectrumDefaults.GIGASCREEN_COLOURS_ALL);
-	}
-
-	/**
-	 * Gets the closest colour in the colourset for the provided rgb getClosestColour
-	 *
-	 * @param rgb the colour to find the closest match for
-	 * @param colourSet the colourset to get the closest colour from
-	 * @return the closest colour set golour
-	 */
-	private static int getClosestColourWithDetail(int rgb, int[] colourSet) {
-		final int[] comps = intToRgbComponents(rgb);
-		return getClosestColourWithDetail(comps[0], comps[1], comps[2], colourSet, OptionsObject.getInstance().getPreferDetail());
-	}
-
-	/**
-	 * Retrieves the colour from the colourSet most like the provided rgb components
+	 * Gets the closest colour in the colourset for the provided rgb components
 	 *
 	 * @param red the red component
 	 * @param green the green component
 	 * @param blue the blue component
-	 * @param colourSet the colour set from which to retrieve the closest colour
-	 * @return the closest colour from the given colour set
+	 * @param colourSet the colours to search
+	 * @return the closest colour
 	 */
-	private static int getClosestColourWithDetail(int red, int green, int blue, int[] colourSet, boolean preferDetail) {
-
-		 // If we prefer detail then make more of the darker shades black.
-		if (preferDetail) {
-			int white = colourSet[colourSet.length - 1];
-			int black = colourSet[0];
-
-			if (red < PREFER_DETAIL_COMPONENT_BOUNDARY
-					&& green < PREFER_DETAIL_COMPONENT_BOUNDARY
-					&& blue < PREFER_DETAIL_COMPONENT_BOUNDARY) {
-				return black;
-			}
-			if (red >= PREFER_DETAIL_COMPONENT_BOUNDARY
-					&& green >= PREFER_DETAIL_COMPONENT_BOUNDARY
-					&& blue >= PREFER_DETAIL_COMPONENT_BOUNDARY) {
-				return white;
+	private static int getClosestColour(int red, int green, int blue, int[] colourSet) {
+		double bestMatch = Double.MAX_VALUE;
+		Integer closest = null;
+		for (int colour : colourSet) {
+			final int[] colourSetComps = intToRgbComponents(colour);
+			double diff = OptionsObject.getInstance().getColourDistanceMode().getColourDistance(red, green, blue, colourSetComps);
+			if (diff < bestMatch) {
+				closest = colour;
+				bestMatch = diff;
 			}
 		}
-		return getClosestColour(red, green, blue, colourSet);
+		return closest;
 	}
 
 	/**
 	 * Gets the closest colour distance from the gigascreen colours for the rgb components
-	 * 
+	 *
 	 * @param red the red component
 	 * @param green the green component
 	 * @param blue the blue component
@@ -178,10 +108,10 @@ public final class ColourHelper {
 		}
 		return bestMatch;
 	}
-	
+
 	/**
 	 * Gets the closest Gigascreen colour from a GigaScreenAttribute
-	 * 
+	 *
 	 * @param rgb the rgb value to find the closest gigascreen colour for
 	 * @param colourSet the attribute containing the colours
 	 * @return the closest matching giga screen colour
@@ -208,21 +138,6 @@ public final class ColourHelper {
 		GigaScreenColour colour = colourSet.getGigaScreenColour(closestMatchPaletteIndex);
 		CACHE.put(key, colour);
 		return colour;
-	}
-
-	private static String getAverageKey(int[] palette) {
-		return "pal"+Arrays.hashCode(palette);
-	}
-
-	private static String getClosestKey(int rgb, GigaScreenAttribute attribute, GigaScreenAttributeStrategy attributeStrategy) {
-		return rgb+"-"+attribute.hashCode()+"-"+attributeStrategy.hashCode();
-	}
-
-	public static int getClosestColour(int originalAlphaRgb, int[] mostPopularRgbColours) {
-
-		// Break the colours into their RGB components
-		int[] originalRgbComps = ColourHelper.intToRgbComponents(originalAlphaRgb);
-		return ColourHelper.getClosestColour(originalRgbComps[0], originalRgbComps[1], originalRgbComps[2], mostPopularRgbColours);
 	}
 
 	/**
@@ -281,29 +196,6 @@ public final class ColourHelper {
 		result = new int[]{rollingAverageRed, rollingAverageGreen, rollingAverageBlue};
 		AVERAGE_CACHE.put(key, result);
 		return result;
-	}
-
-	/**
-	 * Gets the closest colour in the colourset for the provided rgb components
-	 * 
-	 * @param red the red component
-	 * @param green the green component
-	 * @param blue the blue component
-	 * @param colourSet the colours to search
-	 * @return the closest colour
-	 */
-	private static int getClosestColour(int red, int green, int blue, int[] colourSet) {
-		double bestMatch = Double.MAX_VALUE;
-		Integer closest = null;
-		for (int colour : colourSet) {
-			final int[] colourSetComps = intToRgbComponents(colour);
-			double diff = OptionsObject.getInstance().getColourDistanceMode().getColourDistance(red, green, blue, colourSetComps);
-			if (diff < bestMatch) {
-				closest = colour;
-				bestMatch = diff;
-			}
-		}
-		return closest;
 	}
 
 	/**
@@ -577,4 +469,13 @@ public final class ColourHelper {
 		}
 		return SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT[oo.getMonochromeInkIndex()];
 	}
+
+	private static String getAverageKey(int[] palette) {
+		return "pal"+Arrays.hashCode(palette);
+	}
+
+	private static String getClosestKey(int rgb, GigaScreenAttribute attribute, GigaScreenAttributeStrategy attributeStrategy) {
+		return rgb+"-"+attribute.hashCode()+"-"+attributeStrategy.hashCode();
+	}
+
 }

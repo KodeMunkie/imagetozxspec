@@ -17,6 +17,8 @@
 package uk.co.silentsoftware.core.attributestrategy;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
+
+import uk.co.silentsoftware.config.SpectrumDefaults;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
 /**
@@ -34,8 +36,8 @@ public class ForceBrightAttributeStrategy implements AttributeStrategy {
 	public int[] enforceAttributeRule(int mostPopRgb, int secMostPopRgb) {
 
 		// Get the closest bright colours.
-		mostPopRgb = ColourHelper.getClosestBrightSpectrumColour(mostPopRgb);
-		secMostPopRgb = ColourHelper.getClosestBrightSpectrumColour(secMostPopRgb);
+		mostPopRgb = ColourHelper.getClosestColour(mostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT);
+		secMostPopRgb = ColourHelper.getClosestColour(secMostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT);
 
 		return new int[] { mostPopRgb, secMostPopRgb };
 	}

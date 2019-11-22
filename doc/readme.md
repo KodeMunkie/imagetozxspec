@@ -20,7 +20,6 @@ affected by flashing images.
 ### Distribution
 Should you wish to distribute this software and want to provide attribution
 then please link to the GitHub page <https://github.com/KodeMunkie/imagetozxspec>
-N.b. previous versions of this clause can now be ignored.
 
 ### What is Image to ZX Spectrum?
 Image to ZX Spec(trum) is a utility to convert image and video 
@@ -246,16 +245,6 @@ option prevents the error exceeding 8x8 pixels at the expense of a grid
 pattern appearing across the image, but often this may be preferable to
 an image where a number of attribute blocks have visibly wrong colours.
 
-#### Prefer Detail To Colour Accuracy
-This options hints to the converter to favour darker colours in the source image 
-as the Spectrum's black, as opposed to blue or another colour. The same happens
-for light colours but with white.
-The result is that converted images have slightly more contrasting detail (i.e.
-black and white) which significantly improves most images, at the expense of
-colour accuracy. Typically cartoons, bright images, and images with a lot of 
-similar colour benefit the most from this. It also helps reduce Spectrum 
-attribute artifacts.
-
 #### GigaScreen SCR Export Attribute Order
 This option only affects the SCR and Tape GigaScreen export and output 
 (see General Options, SCR Export) and allows you to determine which screen 
@@ -266,10 +255,15 @@ You can choose to order in a number of ways but "Luminosity" is generally
 the best, "None" is fast and "Intelligent" attempts to group colours. 
 Additionally "Brightness" may reduce flicker, "Contrast" and "Hue" may reduce may help reduce attribute artifact edges.
 
-#### Ordered Dither Intensity
-This determines the extent to which an image will be dithered. The lower the 
-value, the less the dither. Increasing the intensity will also increase the 
-brightness of the image (a side effect).
+#### Colour Distance Algorithm
+When making a decision on which Spectrum colours best match those of the source 
+image's pixels an evaluation based is done based on a colour space "distance".
+The choice of algorithm for this evaluation is configured here - typically
+the Compuphase algorithm is the best and uses heuristics based on human vision,
+the classic Image to ZX Spec algorithm next (which is just a simple sum of RGB space distances), 
+followed by the Euclidean which is the straight line distance in RGB space. You may find
+any one of these better suits your use case, typically the latter two are interchangeable however
+classic tends to occasionally favour darker colours which can lead to better results.s
 
 #### Video Import Engine
 By default Image to ZX Spec's uses HumbleVideo which is fast platform native video
@@ -297,17 +291,6 @@ Under the Advanced Options tab choose VLC from the Video Import Engine drop
 down instead of Humble Video and select the directory location of your machine's 
 VLC install. Note you need to be using a version of VLC 3 or later and 
 which matches your machine architecture (i.e. 32 or 64 bit).
-
-#### Not enough memory 
-
-This information is left for legacy purposes - Image To ZX Spec is unlikely
-to run low on memory due to fixed sized buffers which earlier versions didn't
-use.
-Note: 32 bit machines are limited to about 700Mb-1.2GB. 
-To increase the memory settings open a command prompt at the location of the 
-jar file and type java -Xmx1500m Img2ZXSpec.jar where "1500" is the memory in 
-megabytes. This should work but may be only useful for 64 bit machines that 
-allow more process memory.
 
 #### What frame rate should the video be converted at?
 This rate may vary depending on how you are using the video - using the video 

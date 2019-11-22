@@ -246,16 +246,7 @@ class PreferencesDialog extends JFrame  {
         });
 		panel.add(label);
 		panel.add(constrain);
-		
-		label = new JLabel(getCaption("adv_prefer_detail"), JLabel.CENTER);
-		final JCheckBox preferDetail= new JCheckBox();
-		preferDetail.setSelected(oo.getPreferDetail());
-		preferDetail.addActionListener(event -> {
-            oo.setPreferDetail(preferDetail.isSelected());
-            PreferencesService.save();
-        });
-		panel.add(label);
-		panel.add(preferDetail);
+
 		label = new JLabel(getCaption("adv_scr_hsb_order"), JLabel.CENTER);
 		final JComboBox<GigaScreenPaletteOrder> paletteOptions = new JComboBox<>(oo.getGigaScreenPaletteOrders());
 		paletteOptions.setSelectedItem(oo.getGigaScreenPaletteOrder());

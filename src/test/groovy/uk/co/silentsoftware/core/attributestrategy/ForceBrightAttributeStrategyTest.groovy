@@ -23,12 +23,7 @@ import org.junit.Test
 import uk.co.silentsoftware.config.OptionsObject
 
 class ForceBrightAttributeStrategyTest {
-	
-	@Before
-	void setUp() {
-		OptionsObject.getInstance().setPreferDetail(false)
-	}
-	
+
 	/**
 	 * Both are half bright so we leave them as is (we are not forcing a change of set)
 	 */

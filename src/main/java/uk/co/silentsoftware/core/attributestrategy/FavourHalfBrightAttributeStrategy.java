@@ -18,6 +18,7 @@ package uk.co.silentsoftware.core.attributestrategy;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 
+import uk.co.silentsoftware.config.SpectrumDefaults;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
 /**
@@ -39,11 +40,11 @@ public class FavourHalfBrightAttributeStrategy implements AttributeStrategy {
 				// If the less popular colour is bright make it like the popular
 				// one (favour half bright)
 				if (secIsBright) {
-					secMostPopRgb = ColourHelper.getClosestHalfBrightSpectrumColour(secMostPopRgb);
+					secMostPopRgb = ColourHelper.getClosestColour(secMostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_HALF_BRIGHT);
 					// Most popular colour is bright, we'll need to darken it
 					// (favour half bright)
 				} else {
-					mostPopRgb = ColourHelper.getClosestHalfBrightSpectrumColour(mostPopRgb);
+					mostPopRgb = ColourHelper.getClosestColour(mostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_HALF_BRIGHT);
 				}
 			}
 		}

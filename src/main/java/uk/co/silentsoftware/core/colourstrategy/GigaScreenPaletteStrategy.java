@@ -55,7 +55,7 @@ public class GigaScreenPaletteStrategy implements ColourChoiceStrategy {
 
 	@Override
 	public int chooseBestPaletteMatch(int rgb) {
-		return ColourHelper.getClosestGigascreenColour(rgb);
+		return ColourHelper.getClosestColour(rgb, SpectrumDefaults.GIGASCREEN_COLOURS_ALL);
 	}
 
 	@Override

@@ -17,6 +17,8 @@
 package uk.co.silentsoftware.core.attributestrategy;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
+
+import uk.co.silentsoftware.config.SpectrumDefaults;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
 /**
@@ -40,10 +42,10 @@ public class FavourMostPopularAttributeStrategy implements AttributeStrategy {
 			if (mostPopRgb != secMostPopRgb) {
 				// Popular colour is bright so force secondary to be in the bright set
 				if (popIsBright) {
-					secMostPopRgb = ColourHelper.getClosestBrightSpectrumColour(secMostPopRgb);
+					secMostPopRgb = ColourHelper.getClosestColour(secMostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT);
 				// Primary is actually dark (secondary bright), so make the secondary dark
 				} else {
-					secMostPopRgb = ColourHelper.getClosestHalfBrightSpectrumColour(secMostPopRgb);
+					secMostPopRgb = ColourHelper.getClosestColour(secMostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_HALF_BRIGHT);
 				}
 			}
 		}

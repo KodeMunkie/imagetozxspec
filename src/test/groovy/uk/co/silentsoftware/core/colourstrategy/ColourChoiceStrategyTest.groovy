@@ -22,11 +22,6 @@ import org.junit.Test
 import uk.co.silentsoftware.config.OptionsObject
 
 class ColourChoiceStrategyTest {
-
-	@Before
-	void setUp() {
-		OptionsObject.getInstance().setPreferDetail(false)
-	}
 	
 	static int[] createPopularColours() {
 		[0xFFFF0000,0xFF0000FF] as int[] // red and blue

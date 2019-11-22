@@ -17,6 +17,8 @@
 package uk.co.silentsoftware.core.attributestrategy;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
+
+import uk.co.silentsoftware.config.SpectrumDefaults;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
 /**
@@ -38,11 +40,11 @@ public class FavourBrightAttributeStrategy implements AttributeStrategy {
 				// Less popular colour is already bright so change to bright set
 				// for popular colour
 				if (secIsBright) {
-					mostPopRgb = ColourHelper.getClosestBrightSpectrumColour(mostPopRgb);
+					mostPopRgb = ColourHelper.getClosestColour(mostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT);
 					// Most popular colour is bright so change to bright set for
 					// second most popular colour
 				} else {
-					secMostPopRgb = ColourHelper.getClosestBrightSpectrumColour(secMostPopRgb);
+					secMostPopRgb = ColourHelper.getClosestColour(secMostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_BRIGHT);
 				}
 			}
 		}

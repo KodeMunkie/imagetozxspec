@@ -32,7 +32,6 @@ class AbstractOrderedDitherStrategyTest {
 	
 	@Before
 	void setUp() {
-		OptionsObject.getInstance().setPreferDetail(false)
 		strategy = new AbstractOrderedDitherStrategy(){
 
 			@Override

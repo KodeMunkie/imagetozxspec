@@ -44,7 +44,7 @@ public class FullPaletteStrategy implements ColourChoiceStrategy {
 
 	@Override
 	public int chooseBestPaletteMatch(int rgb) {
-		return ColourHelper.getClosestSpectrumColour(rgb);
+		return ColourHelper.getClosestColour(rgb, SpectrumDefaults.SPECTRUM_COLOURS_ALL);
 	}
 
 	@Override

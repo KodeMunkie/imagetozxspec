@@ -26,11 +26,6 @@ import uk.co.silentsoftware.core.converters.image.errordiffusionstrategy.Abstrac
 import java.awt.image.BufferedImage;
 
 class AbstractErrorDiffusionDitherStrategyTest {
-
-	@Before
-	void setUp() {
-		OptionsObject.getInstance().setPreferDetail(false);
-	}
 	
 	/**
 	 * Old: 153,153,153. new: 51,51,51, diffusion is 0.2F, expected result: 173,173,173

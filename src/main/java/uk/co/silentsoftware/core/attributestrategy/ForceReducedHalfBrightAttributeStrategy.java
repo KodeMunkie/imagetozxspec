@@ -17,6 +17,8 @@
 package uk.co.silentsoftware.core.attributestrategy;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
+
+import uk.co.silentsoftware.config.SpectrumDefaults;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
 /**
@@ -36,8 +38,8 @@ public class ForceReducedHalfBrightAttributeStrategy implements AttributeStrateg
 			int secMostPopRgb) {
 	
 		// Get the closest reduced set half bright colours.
-		mostPopRgb = ColourHelper.getClosestReducedHalfBrightSpectrumColour(mostPopRgb);
-		secMostPopRgb = ColourHelper.getClosestReducedHalfBrightSpectrumColour(secMostPopRgb);
+		mostPopRgb = ColourHelper.getClosestColour(mostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_REDUCED_HALF_BRIGHT);
+		secMostPopRgb = ColourHelper.getClosestColour(secMostPopRgb, SpectrumDefaults.SPECTRUM_COLOURS_REDUCED_HALF_BRIGHT);
 		return new int[]{mostPopRgb, secMostPopRgb};
 	}
 
