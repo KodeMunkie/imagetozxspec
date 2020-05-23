@@ -168,7 +168,8 @@ public class OptionsObject {
 	private final List<ScalingObject> scalings;
 	{
 		scalings = new ArrayList<>();
-		scalings.add(new ScalingObject("256x192", SpectrumDefaults.SCREEN_WIDTH, SpectrumDefaults.SCREEN_HEIGHT));
+		scalings.add(new ScalingObject(getCaption("scaling_default"), SpectrumDefaults.SCREEN_WIDTH, SpectrumDefaults.SCREEN_HEIGHT));
+		scalings.add(new ScalingObject(getCaption("scaling_interlace"), SpectrumDefaults.SCREEN_WIDTH, SpectrumDefaults.SCREEN_HEIGHT*2));
 		scalings.add(new ScalingObject(getCaption("scaling_none"), -1, -1));
 		scalings.add(new ScalingObject(getCaption("scaling_width_prop"), SpectrumDefaults.SCREEN_WIDTH, -1));
 		scalings.add(new ScalingObject(getCaption("scaling_height_prop"), -1, SpectrumDefaults.SCREEN_HEIGHT));

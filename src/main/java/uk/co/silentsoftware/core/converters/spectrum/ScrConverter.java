@@ -17,11 +17,7 @@
 package uk.co.silentsoftware.core.converters.spectrum;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import uk.co.silentsoftware.config.OptionsObject;
 import uk.co.silentsoftware.config.SpectrumDefaults;
@@ -92,11 +88,21 @@ public class ScrConverter {
 			for (int x=0; x<width; ++x) {
 				data[x][y] = new ColourAttribute();
 				int[] block = img.getRGB(x*SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE, y*SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE, SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE, SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE, null, 0, SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE);
+				Map<Integer, Integer> check = new HashMap<>();
+				for (int i=0; i<block.length; ++i) {
+					if (check.containsKey(block[i])) {
+						check.put(block[i], check.get(block[i])+1);
+					} else {
+						check.put(block[i], 1);
+					}
+				}
 				data[x][y].setInkRGB(block[0]);
 				data[x][y].setPaperRGB(block[0]);
 				int inkCount = 0;
 				int paperCount = 0;
+				System.out.println("==============");
 				for (int rgb : block) {
+					System.out.println("x:"+x+" y:"+y+" rgb:"+rgb);
 					if (rgb != data[x][y].getInkRGB()) {
 						data[x][y].setPaperRGB(rgb);
 						++paperCount;

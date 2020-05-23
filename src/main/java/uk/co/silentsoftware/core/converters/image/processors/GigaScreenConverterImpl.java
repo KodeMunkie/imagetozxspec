@@ -62,36 +62,71 @@ public class GigaScreenConverterImpl implements ImageConverter {
     @Override
     public ResultImage[] convert(BufferedImage original) {
         OptionsObject oo = OptionsObject.getInstance();
-        BufferedImage output = ImageHelper.copyImage(original);
-        final BufferedImage output1 = new BufferedImage(output.getWidth(), output.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        final BufferedImage output2 = new BufferedImage(output.getWidth(), output.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage output =  new BufferedImage(256, 192, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage output1 = new BufferedImage(256, 192, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage output2 = new BufferedImage(256, 192, BufferedImage.TYPE_INT_ARGB);
 
-        // Dithers the images to the GigaScreen palette (if/else to switch between preview window images and actual output)
-        ResultImage[] resultImage = imageConverter.convert(output);
-        output = resultImage[0].getImage();
+        // Dithers the images to the GigaScreen palette
+        ResultImage[] resultImage = imageConverter.convert(ImageHelper.copyImage(original));
+        BufferedImage gs = resultImage[0].getImage();
 
         // Algorithm replaces each pixel with the colour from the closest matching
         // 4 colour GigaScreen attribute block.
-        GigaScreenAttribute[][] quad = ((GigaScreenPaletteStrategy)oo.getColourMode()).getGigaScreenAttributes(output, oo.getGigaScreenAttributeStrategy().getPalette());
-        GigaScreenAttribute combo = null;
-        for (int y = 0; y < output.getHeight(); ++y) {
-            for (int x = 0; x < output.getWidth(); ++x) {
-                if (x % ATTRIBUTE_BLOCK_SIZE == 0) {
-                    combo = quad[x / ATTRIBUTE_BLOCK_SIZE][y / ATTRIBUTE_BLOCK_SIZE];
+        GigaScreenAttribute[][] quad = ((GigaScreenPaletteStrategy)oo.getColourMode()).getGigaScreenAttributes(gs, oo.getGigaScreenAttributeStrategy().getPalette());
+        GigaScreenAttribute combo;
+
+        for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); y += ATTRIBUTE_BLOCK_SIZE) {
+            for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= original.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
+                int[] sample = gs.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE*2, null, 0, ATTRIBUTE_BLOCK_SIZE);
+                int[] outputBlock = new int[64];
+                int[] outputBlock1 = new int[64];
+                int[] outputBlock2 = new int[64];
+                combo = quad[x / ATTRIBUTE_BLOCK_SIZE][y / ATTRIBUTE_BLOCK_SIZE];
+                for (int j=0; j<sample.length; j++) {
+                    GigaScreenAttribute.GigaScreenColour c = ColourHelper.getClosestGigaScreenColour(averageColour(sample[j], sample[j]), combo);
+                    if (j>=outputBlock.length) {
+                        break;
+                    }
+                    outputBlock[j] = c.getGigascreenColour();
+                    outputBlock1[j] = c.getScreen1Colour();
+                    outputBlock2[j] = c.getScreen2Colour();
                 }
-                GigaScreenAttribute.GigaScreenColour c = ColourHelper.getClosestGigaScreenColour(output.getRGB(x, y), combo);
-                output1.setRGB(x, y, c.getScreen1Colour());
-                output2.setRGB(x, y, c.getScreen2Colour());
+                if (y>=output.getHeight()) {
+                    break;
+                }
+                output.setRGB(x,y,ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE,outputBlock,0,ATTRIBUTE_BLOCK_SIZE);
+                output1.setRGB(x,y,ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE,outputBlock1,0,ATTRIBUTE_BLOCK_SIZE);
+                output2.setRGB(x,y,ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE,outputBlock2,0,ATTRIBUTE_BLOCK_SIZE);
+            }
+            if (y>=output.getHeight()) {
+                break;
             }
         }
 
         if (oo.getExportTape() || oo.getExportScreen()) {
-            orderByGigaScreenPaletteOrder(output1, output2);
+           //orderByGigaScreenPaletteOrder(output1, output2);
+        }
+
+        try {
+            ImageIO.write(output1, "png", new File("c:/temp/file1.png"));
+            ImageIO.write(output2, "png", new File("c:/temp/file2.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return new ResultImage[]{new ResultImage(ResultImageType.FINAL_IMAGE, output),
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output1),
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output2)};
+    }
+
+    private int averageComponent(int comp1, int comp2) {
+        return Math.round(Math.round(Math.sqrt(Math.pow(comp1,2)+Math.pow(comp2,2)/2)));
+    }
+
+    private int averageColour(int col1, int col2) {
+        int[] rgb1 = ColourHelper.intToRgbComponents(col1);
+        int[] rgb2 = ColourHelper.intToRgbComponents(col2);
+        return ColourHelper.componentsToAlphaRgb(averageComponent(rgb1[0],rgb2[0]),averageComponent(rgb1[1],rgb2[1]),averageComponent(rgb1[2],rgb2[2]));
     }
 
     /**
@@ -221,7 +256,7 @@ public class GigaScreenConverterImpl implements ImageConverter {
 
     /**
      * Calculates a value for a given hue/saturation/brightness on a given pixel
-	 * 
+	 *
 	 * @param hsb the hue saturation brightness float
      * @param hsbOption the chosen export option
      * @return the chosen hsboption value
@@ -241,7 +276,7 @@ public class GigaScreenConverterImpl implements ImageConverter {
             case SaturationBrightness:
                 return hsb[1] + hsb[2];
             default:
-                return hsb[2];
+                return hsb[0];
         }
     }
 }
