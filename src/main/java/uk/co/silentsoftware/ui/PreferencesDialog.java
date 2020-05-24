@@ -92,6 +92,7 @@ class PreferencesDialog extends JFrame  {
 		pane.addTab(getCaption("tab_item_advanced_options"), createAdvancedOptions());
 		getContentPane().add(pane);
 		currentInstance = this;
+		setGigascreenDependency();
 	}
 	
 	/**
@@ -105,7 +106,17 @@ class PreferencesDialog extends JFrame  {
 			// Pah just ignore this error, we'll just have a naff looking UI
 		}
 	}
-	
+
+	JComboBox<ScalingObject> scaling = null;
+	void setGigascreenDependency() {
+		if (OptionsObject.INTERLACED == scaling.getSelectedItem()) {
+			colourModes.setSelectedItem(OptionsObject.GIGASCREEN_PALETTE_STRATEGY);
+			colourModes.setEnabled(false);
+		} else {
+			colourModes.setEnabled(true);
+		}
+	}
+
 	/**
 	 * Method that adds the pre process options tab and
 	 * its action listeners.
@@ -118,16 +129,10 @@ class PreferencesDialog extends JFrame  {
 		panel.setLayout(new GridLayout(6,2));
 		JLabel label = new JLabel(getCaption("pp_scaling"), JLabel.CENTER);
 		final JPanel scalingPadding = new JPanel(new GridLayout(3,1));
-		
-		final JComboBox<ScalingObject> scaling = new JComboBox<>(oo.getScalings());
+		scaling = new JComboBox<>(oo.getScalings());
 		scaling.setSelectedItem(oo.getScaling());
 		scaling.addActionListener(event -> {
-			if (OptionsObject.INTERLACED == scaling.getSelectedItem()) {
-				colourModes.setSelectedItem(OptionsObject.GIGASCREEN_PALETTE_STRATEGY);
-				colourModes.setEnabled(false);
-			} else {
-				colourModes.setEnabled(true);
-			}
+			setGigascreenDependency();
             oo.setScaling((ScalingObject)scaling.getSelectedItem());
             PreferencesService.save();
         });
