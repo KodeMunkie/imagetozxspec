@@ -176,7 +176,11 @@ public final class ImageHelper {
 		}
 		BufferedImage mainPreviewImage = new BufferedImage(width*2, height, result.getType());
 		Graphics preBuffer = mainPreviewImage.createGraphics();
-		preBuffer.drawImage(left, 0, 0, null);
+		BufferedImage leftResized = left;
+		if (OptionsObject.INTERLACED == OptionsObject.getInstance().getScaling()) {
+			leftResized = ImageHelper.quickScaleImage(left, width, height);
+		}
+		preBuffer.drawImage(leftResized, 0, 0, null);
 		preBuffer.drawImage(right, width, 0, null);
 		if (OptionsObject.getInstance().getFpsCounter()) {
 			preBuffer.setColor(Color.WHITE);

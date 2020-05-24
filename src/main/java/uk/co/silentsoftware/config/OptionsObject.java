@@ -196,6 +196,8 @@ public class OptionsObject {
 	@PreferencesField
 	public volatile int scaling = 0;
 
+	public static final GigaScreenPaletteStrategy GIGASCREEN_PALETTE_STRATEGY = new GigaScreenPaletteStrategy();
+
 	/**
 	 * Pixel colouring strategy - akin to screen modes on the Spectrum
 	 * i.e. 2, 15 or 102 colours.
@@ -204,7 +206,7 @@ public class OptionsObject {
 	{
 		colourModes = new ArrayList<>();
 		colourModes.add(new FullPaletteStrategy());
-		colourModes.add(new GigaScreenPaletteStrategy());
+		colourModes.add(GIGASCREEN_PALETTE_STRATEGY);
 		colourModes.add(new MonochromePaletteStrategy());
 	}
 

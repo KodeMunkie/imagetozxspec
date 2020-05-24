@@ -85,14 +85,7 @@ public class GigaScreenConverterImpl implements ImageConverter {
             System.arraycopy(merged2, 0, block2, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
             relativeY++;
         }
-        int newY = y;
-        if (interlaced) {
-            newY = y/2;
-        }
-        System.out.println(newY);
-        if (output.getHeight() <= newY) {
-            return;
-        }
+        int newY = interlaced ? y/2 : y;
         output.setRGB(x, newY, ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE, block, 0, ATTRIBUTE_BLOCK_SIZE);
         output1.setRGB(x, newY, ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE, block1, 0, ATTRIBUTE_BLOCK_SIZE);
         output2.setRGB(x, newY, ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE, block2, 0, ATTRIBUTE_BLOCK_SIZE);

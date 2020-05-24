@@ -122,6 +122,12 @@ class PreferencesDialog extends JFrame  {
 		final JComboBox<ScalingObject> scaling = new JComboBox<>(oo.getScalings());
 		scaling.setSelectedItem(oo.getScaling());
 		scaling.addActionListener(event -> {
+			if (OptionsObject.INTERLACED == scaling.getSelectedItem()) {
+				colourModes.setSelectedItem(OptionsObject.GIGASCREEN_PALETTE_STRATEGY);
+				colourModes.setEnabled(false);
+			} else {
+				colourModes.setEnabled(true);
+			}
             oo.setScaling((ScalingObject)scaling.getSelectedItem());
             PreferencesService.save();
         });
@@ -335,6 +341,8 @@ class PreferencesDialog extends JFrame  {
         };
 	}
 
+
+	JComboBox<ColourChoiceStrategy> colourModes;
 	/**
 	 * Method that adds the dither options tab and
 	 * its action listeners.
@@ -351,7 +359,7 @@ class PreferencesDialog extends JFrame  {
 		panel.add(label);
 		panel.add(dithers);
 		label = new JLabel(getCaption("dit_colour_mode"), JLabel.CENTER);
-		final JComboBox<ColourChoiceStrategy> colourModes = new JComboBox<>(oo.getColourModes());
+		colourModes = new JComboBox<>(oo.getColourModes());
 		colourModes.setSelectedItem(oo.getColourMode());
 		colourModes.addActionListener(event -> {
             ColourChoiceStrategy ccs = (ColourChoiceStrategy)colourModes.getSelectedItem();
