@@ -53,36 +53,40 @@ public class GigaScreenConverterImpl implements ImageConverter {
         this.imageConverter = imageConverter;
     }
 
-    private void sampleBlock(int x, int y, GigaScreenAttribute combo, BufferedImage gs, BufferedImage output, BufferedImage output1, BufferedImage output2, boolean interlaced) {
+    private void convertAttributePixelRow(int[] attributeRowData, int[] attributeRowDataOdd, int[] rowPixels, int[] rowScreen1Pixels, int[] rowScreen2Pixels, GigaScreenAttribute combo, boolean interlaced) {
+        // For every pixel on an attribute row of pixels find a gigascreen colour
+        for (int i = 0; i < ATTRIBUTE_BLOCK_SIZE; ++i) {
+            int gigascreenColour = attributeRowData[i];
+            if (interlaced) {
+                gigascreenColour = averageColour(attributeRowData[i], attributeRowDataOdd[i]);
+            }
+            GigaScreenAttribute.GigaScreenColour col = ColourHelper.getClosestGigaScreenColour(gigascreenColour, combo);
+            rowPixels[i] = col.getGigascreenColour();
+            rowScreen1Pixels[i] = col.getScreen1Colour();
+            rowScreen2Pixels[i] = col.getScreen2Colour();
+        }
+    }
+
+    private void convertAttributeBlock(int x, int y, GigaScreenAttribute combo, BufferedImage gs, BufferedImage output, BufferedImage output1, BufferedImage output2, boolean interlaced) {
         int[] block = new int[ATTRIBUTE_BLOCK_SIZE*ATTRIBUTE_BLOCK_SIZE];
         int[] block1 = new int[ATTRIBUTE_BLOCK_SIZE*ATTRIBUTE_BLOCK_SIZE];
         int[] block2 = new int[ATTRIBUTE_BLOCK_SIZE*ATTRIBUTE_BLOCK_SIZE];
         int relativeY = y;
         for (int row=0; row<ATTRIBUTE_BLOCK_SIZE; row++) {
-            int[] merged = new int[ATTRIBUTE_BLOCK_SIZE];
-            int[] merged1 = new int[ATTRIBUTE_BLOCK_SIZE];
-            int[] merged2 = new int[ATTRIBUTE_BLOCK_SIZE];
+            int[] rowPixels = new int[ATTRIBUTE_BLOCK_SIZE];
+            int[] rowScreen1Pixels = new int[ATTRIBUTE_BLOCK_SIZE];
+            int[] rowScreen2Pixels = new int[ATTRIBUTE_BLOCK_SIZE];
 
             int[] even = gs.getRGB(x, relativeY, ATTRIBUTE_BLOCK_SIZE, 1, null, 0, ATTRIBUTE_BLOCK_SIZE);
-            int[] odd = null;
+            int[] odd = null; // if not interlaced we don't need to scan 2 lines at once to sample the difference
             if (interlaced) {
                 relativeY++;
                 odd = gs.getRGB(x, relativeY, ATTRIBUTE_BLOCK_SIZE, 1, null, 0, ATTRIBUTE_BLOCK_SIZE);
             }
-            // For every pixel find a merged colour
-            for (int i = 0; i < ATTRIBUTE_BLOCK_SIZE; ++i) {
-                int gigascreenColour = even[i];
-                if (interlaced) {
-                    gigascreenColour = averageColour(even[i], odd[i]);
-                }
-                GigaScreenAttribute.GigaScreenColour col = ColourHelper.getClosestGigaScreenColour(gigascreenColour, combo);
-                merged[i] = col.getGigascreenColour();
-                merged1[i] = col.getScreen1Colour();
-                merged2[i] = col.getScreen2Colour();
-            }
-            System.arraycopy(merged, 0, block, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
-            System.arraycopy(merged1, 0, block1, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
-            System.arraycopy(merged2, 0, block2, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
+            convertAttributePixelRow(even,odd,rowPixels,rowScreen1Pixels,rowScreen2Pixels,combo,interlaced);
+            System.arraycopy(rowPixels, 0, block, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
+            System.arraycopy(rowScreen1Pixels, 0, block1, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
+            System.arraycopy(rowScreen2Pixels, 0, block2, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
             relativeY++;
         }
         int newY = interlaced ? y/2 : y;
@@ -99,6 +103,9 @@ public class GigaScreenConverterImpl implements ImageConverter {
         OptionsObject oo = OptionsObject.getInstance();
         int height = original.getHeight();
         int atrributeHeightMultipler = 1;
+
+        // If interlace we have a double height input for a regular output (over 2 screens), so we need to
+        // compare odd and even fields to halve the height.
         boolean interlaced = OptionsObject.INTERLACED == oo.getScaling();
         if (interlaced) {
             height /= 2;
@@ -113,15 +120,14 @@ public class GigaScreenConverterImpl implements ImageConverter {
         BufferedImage gs = resultImage[0].getImage();
 
         // Algorithm replaces each pixel with the colour from the closest matching
-        // 4 colour GigaScreen attribute block.
+        // 4 colour GigaScreen attribute palette. Quad is the array of the possible 4 colour palettes.
         GigaScreenAttribute[][] quad = ((GigaScreenPaletteStrategy)oo.getColourMode()).getGigaScreenAttributes(gs, oo.getGigaScreenAttributeStrategy().getPalette());
-        GigaScreenAttribute combo;
-
+        GigaScreenAttribute chosenQuad;
 
         for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= gs.getHeight(); y += (ATTRIBUTE_BLOCK_SIZE*atrributeHeightMultipler)) {
             for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= gs.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= gs.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
-                combo = quad[x / ATTRIBUTE_BLOCK_SIZE][y / ATTRIBUTE_BLOCK_SIZE];
-                sampleBlock(x, y, combo, gs, output, output1, output2, interlaced);
+                chosenQuad = quad[x / ATTRIBUTE_BLOCK_SIZE][y / ATTRIBUTE_BLOCK_SIZE];
+                convertAttributeBlock(x, y, chosenQuad, gs, output, output1, output2, interlaced);
             }
         }
 
@@ -138,16 +144,14 @@ public class GigaScreenConverterImpl implements ImageConverter {
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output2)};
     }
 
-    @Override
-    public String getDitherStrategyLabel() {
-        return imageConverter.getDitherStrategyLabel();
-    }
-
-    @Override
-    public boolean getDrawStrategyLabel() {
-        return imageConverter.getDrawStrategyLabel();
-    }
-
+    /**
+     * Produces an average of 2 rgb component values.
+     * Depending on averaging method chosen in options may return different values.
+     *
+     * @param comp1 rgb component 1
+     * @param comp2 rgb component 2
+     * @return the averaged component
+     */
     private int averageComponent(int comp1, int comp2) {
         if (OptionsObject.getInstance().getColourspaceAveraging()) {
             return Math.round(Math.round(Math.sqrt((Math.pow(comp1,2)+Math.pow(comp2,2))/2)));
@@ -155,6 +159,14 @@ public class GigaScreenConverterImpl implements ImageConverter {
         return (comp1+comp2)/2;
     }
 
+    /**
+     * Averages two colours.
+     * Depending on averaging method chosen in options may return different values.
+     *
+     * @param col1 colour 1
+     * @param col2 colour 2
+     * @return the average colour
+     */
     private int averageColour(int col1, int col2) {
         int[] rgb1 = ColourHelper.intToRgbComponents(col1);
         int[] rgb2 = ColourHelper.intToRgbComponents(col2);
@@ -248,36 +260,49 @@ public class GigaScreenConverterImpl implements ImageConverter {
             orderByAesthetics(output1, output2);
             return;
         }
+        orderByHsb(output1, output2, paletteOrder);
+    }
+
+    /**
+     * Finds the total of a given HSB value within an array
+     *
+     * @param outRgb the pixel array to find the HSB total from
+     * @param paletteOrder the hsb option choice
+     * @return the hsb float total value
+     */
+    private float totalChosenHsbValue(int outRgb[], GigaScreenPaletteOrder paletteOrder) {
+        Set<Integer> cols = new HashSet<>();
+        for (int rgb : outRgb) {
+            cols.add(rgb);
+            if (cols.size() == 4) {
+                break;
+            }
+        }
+        float totalCount = 0;
+        for (int rgb : cols) {
+            int[] rgbComps = ColourHelper.intToRgbComponents(rgb);
+            float[] hsb = Color.RGBtoHSB(rgbComps[0], rgbComps[1], rgbComps[2], null);
+            totalCount += getGigaScreenHSBCount(hsb, paletteOrder);
+        }
+        return totalCount;
+    }
+
+    /**
+     * Reorders attributes by chosen hsb option
+     *
+     * @param output1 the first image to reorder attributes in
+     * @param output2 the second image to reorder attributes in
+     * @param paletteOrder the option to total the hsb values by (e.g. find total of brightness)
+     */
+    private void orderByHsb(BufferedImage output1, BufferedImage output2, GigaScreenPaletteOrder paletteOrder) {
         for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= output1.getHeight(); y += ATTRIBUTE_BLOCK_SIZE) {
             for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= output1.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= output1.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
                 int outRgb1[] = output1.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, null, 0, ATTRIBUTE_BLOCK_SIZE);
                 int outRgb2[] = output2.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, null, 0, ATTRIBUTE_BLOCK_SIZE);
-                float totalCount1 = 0;
-                float totalCount2 = 0;
-                Set<Integer> cols = new HashSet<>();
-                for (int rgb : outRgb1) {
-                    cols.add(rgb);
-                    if (cols.size() == 4) {
-                        break;
-                    }
-                }
-                for (int rgb : cols) {
-                    int[] rgbComps = ColourHelper.intToRgbComponents(rgb);
-                    float[] hsb = Color.RGBtoHSB(rgbComps[0], rgbComps[1], rgbComps[2], null);
-                    totalCount1 += getGigaScreenHSBCount(hsb, paletteOrder);
-                }
-                cols = new HashSet<>();
-                for (int rgb : outRgb2) {
-                    cols.add(rgb);
-                    if (cols.size() == 4) {
-                        break;
-                    }
-                }
-                for (int rgb : cols) {
-                    int[] rgbComps = ColourHelper.intToRgbComponents(rgb);
-                    float[] hsb = Color.RGBtoHSB(rgbComps[0], rgbComps[1], rgbComps[2], null);
-                    totalCount2 += getGigaScreenHSBCount(hsb, paletteOrder);
-                }
+                float totalCount1 = totalChosenHsbValue(outRgb1, paletteOrder);
+                float totalCount2 = totalChosenHsbValue(outRgb2, paletteOrder);
+
+                // Place attribute block with lowest hsb total on first screen
                 if (totalCount1 > totalCount2) {
                     output1.setRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, outRgb2, 0, ATTRIBUTE_BLOCK_SIZE);
                     output2.setRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, outRgb1, 0, ATTRIBUTE_BLOCK_SIZE);
@@ -311,4 +336,16 @@ public class GigaScreenConverterImpl implements ImageConverter {
                 return hsb[0];
         }
     }
+
+    @Override
+    public String getDitherStrategyLabel() {
+        return imageConverter.getDitherStrategyLabel();
+    }
+
+    @Override
+    public boolean getDrawStrategyLabel() {
+        return imageConverter.getDrawStrategyLabel();
+    }
+
+
 }
