@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2019 Silent Software (Benjamin Brown)
+ * Copyright (C) 2020 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -86,7 +86,14 @@ public class OptionsObject {
 	 */
 	@PreferencesField
 	private volatile boolean turboMode = false;
-	
+
+	/**
+	 * Interlace colour needs to average two lines of pixels. The 3D colourspace correct way is
+	 * to use a square root average, but it seems just regular averaging is better for the ZX.
+	 */
+	@PreferencesField
+	private volatile boolean colourSpaceAveraging = false;
+
 	/**
 	 * Prefix identifier for custom basic loaders
 	 */
@@ -161,7 +168,10 @@ public class OptionsObject {
 	 */
 	@PreferencesField
 	private volatile String selectedDitherStrategyType = ErrorDiffusionDitherStrategy.class.getName();
-	
+
+	public final static ScalingObject INTERLACED = new ScalingObject(getCaption("scaling_interlace"),
+			SpectrumDefaults.SCREEN_WIDTH, SpectrumDefaults.SCREEN_HEIGHT*2);
+
 	/**
 	 * Scaling modes available
 	 */
@@ -169,7 +179,7 @@ public class OptionsObject {
 	{
 		scalings = new ArrayList<>();
 		scalings.add(new ScalingObject(getCaption("scaling_default"), SpectrumDefaults.SCREEN_WIDTH, SpectrumDefaults.SCREEN_HEIGHT));
-		scalings.add(new ScalingObject(getCaption("scaling_interlace"), SpectrumDefaults.SCREEN_WIDTH, SpectrumDefaults.SCREEN_HEIGHT*2));
+		scalings.add(INTERLACED);
 		scalings.add(new ScalingObject(getCaption("scaling_none"), -1, -1));
 		scalings.add(new ScalingObject(getCaption("scaling_width_prop"), SpectrumDefaults.SCREEN_WIDTH, -1));
 		scalings.add(new ScalingObject(getCaption("scaling_height_prop"), -1, SpectrumDefaults.SCREEN_HEIGHT));
@@ -732,6 +742,14 @@ public class OptionsObject {
 
 	public void setGigaScreenPaletteOrder(GigaScreenPaletteOrder gigaScreenAttributeOrderingOption) {
 		this.gigaScreenPaletteOrder = gigaScreenAttributeOrderingOption.name();
+	}
+
+	public boolean getColourspaceAveraging() {
+		return colourSpaceAveraging;
+	}
+
+	public void setColourspaceAveraging(boolean colourSpaceAveraging) {
+		this.colourSpaceAveraging = colourSpaceAveraging;
 	}
 
 	public ColourDistanceStrategy getColourDistanceMode() {
