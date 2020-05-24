@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2019 Silent Software (Benjamin Brown)
+ * Copyright (C) 2020 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -87,6 +87,16 @@ public class ErrorDiffusionConverterImpl implements ImageConverter {
 			PreviewLabeller.drawPreviewStrategyWithName(output, ditherStrategy.toString());
 		}
 		return new ResultImage[]{new ResultImage(ResultImageType.FINAL_IMAGE, output)};
+	}
+
+	@Override
+	public String getDitherStrategyLabel() {
+		return ditherStrategy.toString();
+	}
+
+	@Override
+	public boolean getDrawStrategyLabel() {
+		return drawStrategyLabel;
 	}
 
 	/**

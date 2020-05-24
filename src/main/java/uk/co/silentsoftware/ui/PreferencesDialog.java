@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2019 Silent Software (Benjamin Brown)
+ * Copyright (C) 2020 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -246,6 +246,15 @@ class PreferencesDialog extends JFrame  {
         });
 		panel.add(label);
 		panel.add(constrain);
+		label = new JLabel(getCaption("adv_colourspace_averaging"), JLabel.CENTER);
+		final JCheckBox colourspaceAveraging = new JCheckBox();
+		colourspaceAveraging.setSelected(oo.getColourspaceAveraging());
+		colourspaceAveraging.addActionListener(event -> {
+			oo.setSerpentine(colourspaceAveraging.isSelected());
+			PreferencesService.save();
+		});
+		panel.add(label);
+		panel.add(colourspaceAveraging);
 
 		label = new JLabel(getCaption("adv_scr_hsb_order"), JLabel.CENTER);
 		final JComboBox<GigaScreenPaletteOrder> paletteOptions = new JComboBox<>(oo.getGigaScreenPaletteOrders());
@@ -438,7 +447,7 @@ class PreferencesDialog extends JFrame  {
 		v.addAll(Arrays.asList(oo.getErrorDithers()));
 		v.addAll(Arrays.asList(oo.getOrderedDithers()));
 		v.addAll(Arrays.asList(oo.getOtherDithers()));
-		
+
 		dithers.setModel(new DefaultComboBoxModel<>(v));
 		dithers.setSelectedItem(oo.getSelectedDitherStrategy());
 		dithers.addActionListener(event -> {

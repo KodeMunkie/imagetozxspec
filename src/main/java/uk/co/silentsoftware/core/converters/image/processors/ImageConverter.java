@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2019 Silent Software (Benjamin Brown)
+ * Copyright (C) 2020 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -18,6 +18,7 @@ package uk.co.silentsoftware.core.converters.image.processors;
 
 import java.awt.image.BufferedImage;
 
+import uk.co.silentsoftware.core.converters.image.DitherStrategy;
 import uk.co.silentsoftware.core.converters.image.ResultImage;
 
 /**
@@ -32,4 +33,8 @@ public interface ImageConverter {
 	 * @return the result images (preview, final)
 	 */
 	 ResultImage[] convert(final BufferedImage original);
+
+	 String getDitherStrategyLabel();
+
+	 boolean getDrawStrategyLabel();
 }

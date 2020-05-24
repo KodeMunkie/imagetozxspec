@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2019 Silent Software (Benjamin Brown)
+ * Copyright (C) 2020 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -26,11 +26,8 @@ import uk.co.silentsoftware.core.helpers.ColourHelper;
 import uk.co.silentsoftware.core.helpers.ImageHelper;
 import uk.co.silentsoftware.core.helpers.TallyValue;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
@@ -56,15 +53,67 @@ public class GigaScreenConverterImpl implements ImageConverter {
         this.imageConverter = imageConverter;
     }
 
+    private void sampleBlock(int x, int y, GigaScreenAttribute combo, BufferedImage gs, BufferedImage output, BufferedImage output1, BufferedImage output2, boolean interlaced) {
+        int[] block = new int[ATTRIBUTE_BLOCK_SIZE*ATTRIBUTE_BLOCK_SIZE];
+        int[] block1 = new int[ATTRIBUTE_BLOCK_SIZE*ATTRIBUTE_BLOCK_SIZE];
+        int[] block2 = new int[ATTRIBUTE_BLOCK_SIZE*ATTRIBUTE_BLOCK_SIZE];
+        int relativeY = y;
+        for (int row=0; row<ATTRIBUTE_BLOCK_SIZE; row++) {
+            int[] merged = new int[ATTRIBUTE_BLOCK_SIZE];
+            int[] merged1 = new int[ATTRIBUTE_BLOCK_SIZE];
+            int[] merged2 = new int[ATTRIBUTE_BLOCK_SIZE];
+
+            int[] even = gs.getRGB(x, relativeY, ATTRIBUTE_BLOCK_SIZE, 1, null, 0, ATTRIBUTE_BLOCK_SIZE);
+            int[] odd = null;
+            if (interlaced) {
+                relativeY++;
+                odd = gs.getRGB(x, relativeY, ATTRIBUTE_BLOCK_SIZE, 1, null, 0, ATTRIBUTE_BLOCK_SIZE);
+            }
+            // For every pixel find a merged colour
+            for (int i = 0; i < ATTRIBUTE_BLOCK_SIZE; ++i) {
+                int gigascreenColour = even[i];
+                if (interlaced) {
+                    gigascreenColour = averageColour(even[i], odd[i]);
+                }
+                GigaScreenAttribute.GigaScreenColour col = ColourHelper.getClosestGigaScreenColour(gigascreenColour, combo);
+                merged[i] = col.getGigascreenColour();
+                merged1[i] = col.getScreen1Colour();
+                merged2[i] = col.getScreen2Colour();
+            }
+            System.arraycopy(merged, 0, block, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
+            System.arraycopy(merged1, 0, block1, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
+            System.arraycopy(merged2, 0, block2, row * ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE);
+            relativeY++;
+        }
+        int newY = y;
+        if (interlaced) {
+            newY = y/2;
+        }
+        System.out.println(newY);
+        if (output.getHeight() <= newY) {
+            return;
+        }
+        output.setRGB(x, newY, ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE, block, 0, ATTRIBUTE_BLOCK_SIZE);
+        output1.setRGB(x, newY, ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE, block1, 0, ATTRIBUTE_BLOCK_SIZE);
+        output2.setRGB(x, newY, ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE, block2, 0, ATTRIBUTE_BLOCK_SIZE);
+    }
+
     /*
      * {@inheritDoc}
      */
     @Override
     public ResultImage[] convert(BufferedImage original) {
         OptionsObject oo = OptionsObject.getInstance();
-        final BufferedImage output =  new BufferedImage(256, 192, BufferedImage.TYPE_INT_ARGB);
-        final BufferedImage output1 = new BufferedImage(256, 192, BufferedImage.TYPE_INT_ARGB);
-        final BufferedImage output2 = new BufferedImage(256, 192, BufferedImage.TYPE_INT_ARGB);
+        int height = original.getHeight();
+        int atrributeHeightMultipler = 1;
+        boolean interlaced = OptionsObject.INTERLACED == oo.getScaling();
+        if (interlaced) {
+            height /= 2;
+            atrributeHeightMultipler = 2;
+        }
+        final BufferedImage output =  new BufferedImage(original.getWidth(), height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage output1 = new BufferedImage(original.getWidth(), height, BufferedImage.TYPE_INT_ARGB);
+        final BufferedImage output2 = new BufferedImage(original.getWidth(), height, BufferedImage.TYPE_INT_ARGB);
 
         // Dithers the images to the GigaScreen palette
         ResultImage[] resultImage = imageConverter.convert(ImageHelper.copyImage(original));
@@ -75,43 +124,20 @@ public class GigaScreenConverterImpl implements ImageConverter {
         GigaScreenAttribute[][] quad = ((GigaScreenPaletteStrategy)oo.getColourMode()).getGigaScreenAttributes(gs, oo.getGigaScreenAttributeStrategy().getPalette());
         GigaScreenAttribute combo;
 
-        for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); y += ATTRIBUTE_BLOCK_SIZE) {
-            for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= original.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
-                int[] sample = gs.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE*2, null, 0, ATTRIBUTE_BLOCK_SIZE);
-                int[] outputBlock = new int[64];
-                int[] outputBlock1 = new int[64];
-                int[] outputBlock2 = new int[64];
+
+        for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= gs.getHeight(); y += (ATTRIBUTE_BLOCK_SIZE*atrributeHeightMultipler)) {
+            for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= gs.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= gs.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
                 combo = quad[x / ATTRIBUTE_BLOCK_SIZE][y / ATTRIBUTE_BLOCK_SIZE];
-                for (int j=0; j<sample.length; j++) {
-                    GigaScreenAttribute.GigaScreenColour c = ColourHelper.getClosestGigaScreenColour(averageColour(sample[j], sample[j]), combo);
-                    if (j>=outputBlock.length) {
-                        break;
-                    }
-                    outputBlock[j] = c.getGigascreenColour();
-                    outputBlock1[j] = c.getScreen1Colour();
-                    outputBlock2[j] = c.getScreen2Colour();
-                }
-                if (y>=output.getHeight()) {
-                    break;
-                }
-                output.setRGB(x,y,ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE,outputBlock,0,ATTRIBUTE_BLOCK_SIZE);
-                output1.setRGB(x,y,ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE,outputBlock1,0,ATTRIBUTE_BLOCK_SIZE);
-                output2.setRGB(x,y,ATTRIBUTE_BLOCK_SIZE,ATTRIBUTE_BLOCK_SIZE,outputBlock2,0,ATTRIBUTE_BLOCK_SIZE);
-            }
-            if (y>=output.getHeight()) {
-                break;
+                sampleBlock(x, y, combo, gs, output, output1, output2, interlaced);
             }
         }
 
         if (oo.getExportTape() || oo.getExportScreen()) {
-           //orderByGigaScreenPaletteOrder(output1, output2);
+           orderByGigaScreenPaletteOrder(output1, output2);
         }
 
-        try {
-            ImageIO.write(output1, "png", new File("c:/temp/file1.png"));
-            ImageIO.write(output2, "png", new File("c:/temp/file2.png"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (imageConverter.getDrawStrategyLabel()) {
+            PreviewLabeller.drawPreviewStrategyWithName(output, imageConverter.getDitherStrategyLabel().toString());
         }
 
         return new ResultImage[]{new ResultImage(ResultImageType.FINAL_IMAGE, output),
@@ -119,8 +145,21 @@ public class GigaScreenConverterImpl implements ImageConverter {
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output2)};
     }
 
+    @Override
+    public String getDitherStrategyLabel() {
+        return imageConverter.getDitherStrategyLabel();
+    }
+
+    @Override
+    public boolean getDrawStrategyLabel() {
+        return imageConverter.getDrawStrategyLabel();
+    }
+
     private int averageComponent(int comp1, int comp2) {
-        return Math.round(Math.round(Math.sqrt(Math.pow(comp1,2)+Math.pow(comp2,2)/2)));
+        if (OptionsObject.getInstance().getColourspaceAveraging()) {
+            return Math.round(Math.round(Math.sqrt((Math.pow(comp1,2)+Math.pow(comp2,2))/2)));
+        }
+        return (comp1+comp2)/2;
     }
 
     private int averageColour(int col1, int col2) {

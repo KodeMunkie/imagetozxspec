@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2019 Silent Software (Benjamin Brown)
+ * Copyright (C) 2020 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -17,6 +17,8 @@
 package uk.co.silentsoftware.core.converters.spectrum;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import uk.co.silentsoftware.config.OptionsObject;
@@ -34,6 +36,8 @@ import uk.co.silentsoftware.core.converters.image.processors.GigaScreenConverter
 import uk.co.silentsoftware.core.converters.image.processors.ImageConverter;
 import uk.co.silentsoftware.core.helpers.ByteHelper;
 import uk.co.silentsoftware.core.helpers.ImageHelper;
+
+import javax.imageio.ImageIO;
 
 /**
  * Converter to save images to the Spectrum SCR 
@@ -100,9 +104,7 @@ public class ScrConverter {
 				data[x][y].setPaperRGB(block[0]);
 				int inkCount = 0;
 				int paperCount = 0;
-				System.out.println("==============");
 				for (int rgb : block) {
-					System.out.println("x:"+x+" y:"+y+" rgb:"+rgb);
 					if (rgb != data[x][y].getInkRGB()) {
 						data[x][y].setPaperRGB(rgb);
 						++paperCount;
