@@ -42,28 +42,38 @@ class CoffeeDialog {
 	
 	void showPopupIfNecessary() {
 		log.debug("Application starts: {}", optionsObject.getStarts());
-		if (optionsObject.getStarts() == STARTS_BEFORE_COFFEE) {
+
+		// Don't show popup if the user has actually read the text
+		if (optionsObject.getStarts() == -1) {
+			return;
+		}
+		optionsObject.setStarts((optionsObject.getStarts() + 1));
+		if (optionsObject.getStarts() > STARTS_BEFORE_COFFEE) {
 			JTextPane aboutField = new JTextPane();
 			aboutField.setContentType("text/html");
 			aboutField.setText("<h2>You seem to be enjoying Image to ZX Spec!</h2>" +
-					"Did you know Image to ZX Spec has been in development for the last 8 years?<br>"+
-					"That's a lot of coffee, so please consider a contribution of any amount to the<br>"+
-					"developer's coffee buying budget!<br>"+
-					"<h3><a href='"+COFFEE_LINK+"'>Buy the developer a coffee</a></h3>"+
-					"This popup will never be shown again, but if you want to buy a coffee later you can<br>"+
-					"always find the link in the About dialog.<br><br>"+
-					"<b>Thank you for your support.</b>");
+					"Did you know Image to ZX Spec has been developed for the last 11 years?<br><br>" +
+					"In that time just one person kindly donated £5 to the developer's coffee buying<br>" +
+					"budget so please consider a contribution of any amount!<br>" +
+					"<h3><a href='" + COFFEE_LINK + "'>Buy the developer a coffee</a></h3>" +
+					"This popup will now continue to show on each start should you want to buy a<br>" +
+					"a coffee later. Incidentally, if you read this far, clicking the buy the developer a<br>" +
+					"coffee link will also disable this popup in future.<br><br>" +
+					"<b>Thank you in advance for your support.</b>");
 			aboutField.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 			aboutField.setEditable(false);
 			aboutField.setOpaque(false);
 			aboutField.addHyperlinkListener(e -> {
-                if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType())	{
-                    openLink(e.getURL());
-                }
-            });
+				if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
+					openLink(e.getURL());
+					// Even if not donated we disable the popup because I'm a nice guy and the user
+					// spent the time to at least read the entire text.
+					optionsObject.setStarts(-1);
+				}
+			});
 			JOptionPane.showMessageDialog(null, aboutField, "Information", JOptionPane.INFORMATION_MESSAGE, ImageToZxSpec.IMAGE_ICON);
 		}
-		optionsObject.setStarts((optionsObject.getStarts()+1));
+
 		PreferencesService.save();		
 	}
 	
