@@ -1,4 +1,4 @@
-Image To ZX Spectrum 2.0.2
+Image To ZX Spectrum 2.2.0
 --------------------------
 
 ### Legal / Disclaimer
@@ -21,13 +21,16 @@ affected by flashing images.
 Should you wish to distribute this software and want to provide attribution
 then please link to the GitHub page <https://github.com/KodeMunkie/imagetozxspec>
 
+
 ### What is Image to ZX Spectrum?
 Image to ZX Spec(trum) is a utility to convert image and video 
 files to a REAL ZX Spectrum as a slideshow/video, to a Spectrum 
 compatible file format for games development (SCREEN$ "scr" format) 
 or create retro art posters (images of any size - memory limited - can 
-have a Spectrum effect applied to them).
-
+have a Spectrum effect applied to them). It also allows you to
+display images on a standard 128K machine in new screen modes that 
+weren't available during the machine's heyday (such as 102 colours high 
+resolution).
 
 ### Installation/Usage
 If you have Java installed just double click the Img2ZXSpec.jar
@@ -126,6 +129,9 @@ Scales the source image to the Spectrum's native resolution, with options to
 keep the image proportional. Selecting "None" will create a "Spectrumified" 
 image but it is not compatible with a real Spectrum - use png/jpeg export
 output to view images converted with this option.
+The 256x384 (Gigascreen Interlaced) requires that the Gigascreen Palette
+colour mode is enabled and will not allow the [Colour Mode](#colour-mode) 
+dropdown to be changed whilst it is selected.
 
 #### Video Sampling Rate
 Converting video to a Spectrum requires some skill balancing the frame rate
