@@ -107,9 +107,10 @@ public class GigaScreenConverterImpl implements ImageConverter {
         // If interlace we have a double height input for a regular output (over 2 screens), so we need to
         // compare odd and even fields to halve the height.
         boolean interlaced = OptionsObject.INTERLACED == oo.getScaling();
+        int yStride = ATTRIBUTE_BLOCK_SIZE;
         if (interlaced) {
             height /= 2;
-            atrributeHeightMultipler = 2;
+            yStride = ATTRIBUTE_BLOCK_SIZE*2;
         }
         final BufferedImage output =  new BufferedImage(original.getWidth(), height, BufferedImage.TYPE_INT_ARGB);
         final BufferedImage output1 = new BufferedImage(original.getWidth(), height, BufferedImage.TYPE_INT_ARGB);
@@ -124,8 +125,8 @@ public class GigaScreenConverterImpl implements ImageConverter {
         GigaScreenAttribute[][] quad = ((GigaScreenPaletteStrategy)oo.getColourMode()).getGigaScreenAttributes(gs, oo.getGigaScreenAttributeStrategy().getPalette());
         GigaScreenAttribute chosenQuad;
 
-        for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= gs.getHeight(); y += (ATTRIBUTE_BLOCK_SIZE*atrributeHeightMultipler)) {
-            for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= gs.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= gs.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
+        for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= gs.getHeight(); y += yStride) {
+            for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= gs.getWidth() && y + yStride <= gs.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
                 chosenQuad = quad[x / ATTRIBUTE_BLOCK_SIZE][y / ATTRIBUTE_BLOCK_SIZE];
                 convertAttributeBlock(x, y, chosenQuad, gs, output, output1, output2, interlaced);
             }
