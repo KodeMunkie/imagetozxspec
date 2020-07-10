@@ -102,7 +102,6 @@ public class GigaScreenConverterImpl implements ImageConverter {
     public ResultImage[] convert(BufferedImage original) {
         OptionsObject oo = OptionsObject.getInstance();
         int height = original.getHeight();
-        int atrributeHeightMultipler = 1;
 
         // If interlace we have a double height input for a regular output (over 2 screens), so we need to
         // compare odd and even fields to halve the height.
@@ -137,7 +136,7 @@ public class GigaScreenConverterImpl implements ImageConverter {
         }
 
         if (imageConverter.getDrawStrategyLabel()) {
-            PreviewLabeller.drawPreviewStrategyWithName(output, imageConverter.getDitherStrategyLabel().toString());
+            PreviewLabeller.drawPreviewStrategyWithName(output, imageConverter.getDitherStrategyLabel());
         }
 
         return new ResultImage[]{new ResultImage(ResultImageType.FINAL_IMAGE, output),
