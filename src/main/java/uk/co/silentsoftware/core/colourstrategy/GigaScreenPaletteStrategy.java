@@ -95,7 +95,7 @@ public class GigaScreenPaletteStrategy implements ColourChoiceStrategy {
 		String key = getKey(original, palette, OptionsObject.getInstance().getGigaScreenAttributeStrategy());
 		GigaScreenAttribute[][] entries = CACHE.getIfPresent(key);
 		if (entries != null) {
-			//return entries;
+			return entries;
 		}
 		entries = new GigaScreenAttribute[original.getWidth() / ATTRIBUTE_BLOCK_SIZE][original.getHeight() / ATTRIBUTE_BLOCK_SIZE];
 		for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= original.getHeight(); y += ATTRIBUTE_BLOCK_SIZE) {
