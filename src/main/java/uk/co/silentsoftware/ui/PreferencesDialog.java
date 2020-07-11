@@ -257,15 +257,6 @@ class PreferencesDialog extends JFrame  {
         });
 		panel.add(label);
 		panel.add(constrain);
-		label = new JLabel(getCaption("adv_colourspace_averaging"), JLabel.CENTER);
-		final JCheckBox colourspaceAveraging = new JCheckBox();
-		colourspaceAveraging.setSelected(oo.getColourspaceAveraging());
-		colourspaceAveraging.addActionListener(event -> {
-			oo.setSerpentine(colourspaceAveraging.isSelected());
-			PreferencesService.save();
-		});
-		panel.add(label);
-		panel.add(colourspaceAveraging);
 
 		label = new JLabel(getCaption("adv_scr_hsb_order"), JLabel.CENTER);
 		final JComboBox<GigaScreenPaletteOrder> paletteOptions = new JComboBox<>(oo.getGigaScreenPaletteOrders());

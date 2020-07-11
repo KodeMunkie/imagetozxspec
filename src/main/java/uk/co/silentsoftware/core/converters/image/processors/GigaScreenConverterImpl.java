@@ -28,8 +28,8 @@ import uk.co.silentsoftware.core.helpers.TallyValue;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static uk.co.silentsoftware.config.SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE;
 import static uk.co.silentsoftware.core.helpers.ColourHelper.luminositySum;
@@ -56,11 +56,13 @@ public class GigaScreenConverterImpl implements ImageConverter {
     private void convertAttributePixelRow(int[] attributeRowData, int[] attributeRowDataOdd, int[] rowPixels, int[] rowScreen1Pixels, int[] rowScreen2Pixels, GigaScreenAttribute combo, boolean interlaced) {
         // For every pixel on an attribute row of pixels find a gigascreen colour
         for (int i = 0; i < ATTRIBUTE_BLOCK_SIZE; ++i) {
-            int gigascreenColour = attributeRowData[i];
-            if (interlaced) {
-                gigascreenColour = averageColour(attributeRowData[i], attributeRowDataOdd[i]);
-            }
-            GigaScreenAttribute.GigaScreenColour col = ColourHelper.getClosestGigaScreenColour(gigascreenColour, combo);
+
+            // Life's too short to determine the best way to average two gigascreen attributes from two different rows,
+            // that are each represented using two screens' persistence of vision colours.
+            // Picking the first screen's (even) attributes works well.
+            // Colourspace averaging, which I tested, was awful but if you want a challenge have a look a commit before
+            // this which includes the code to do it.
+            GigaScreenAttribute.GigaScreenColour col = ColourHelper.getClosestGigaScreenColour(attributeRowData[i], combo);
             rowPixels[i] = col.getGigascreenColour();
             rowScreen1Pixels[i] = col.getScreen1Colour();
             rowScreen2Pixels[i] = col.getScreen2Colour();
@@ -142,35 +144,6 @@ public class GigaScreenConverterImpl implements ImageConverter {
         return new ResultImage[]{new ResultImage(ResultImageType.FINAL_IMAGE, output),
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output1),
                 new ResultImage(ResultImageType.SUPPORTING_IMAGE, output2)};
-    }
-
-    /**
-     * Produces an average of 2 rgb component values.
-     * Depending on averaging method chosen in options may return different values.
-     *
-     * @param comp1 rgb component 1
-     * @param comp2 rgb component 2
-     * @return the averaged component
-     */
-    private int averageComponent(int comp1, int comp2) {
-        if (OptionsObject.getInstance().getColourspaceAveraging()) {
-            return Math.round(Math.round(Math.sqrt((Math.pow(comp1,2)+Math.pow(comp2,2))/2)));
-        }
-        return (comp1+comp2)/2;
-    }
-
-    /**
-     * Averages two colours.
-     * Depending on averaging method chosen in options may return different values.
-     *
-     * @param col1 colour 1
-     * @param col2 colour 2
-     * @return the average colour
-     */
-    private int averageColour(int col1, int col2) {
-        int[] rgb1 = ColourHelper.intToRgbComponents(col1);
-        int[] rgb2 = ColourHelper.intToRgbComponents(col2);
-        return ColourHelper.componentsToAlphaRgb(averageComponent(rgb1[0],rgb2[0]),averageComponent(rgb1[1],rgb2[1]),averageComponent(rgb1[2],rgb2[2]));
     }
 
     /**

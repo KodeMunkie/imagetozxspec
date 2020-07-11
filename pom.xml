@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>uk.co.silentsoftware</groupId>
     <artifactId>imagetozxspec</artifactId>
-    <version>2.2.0-beta</version>
+    <version>2.2.1-beta</version>
     <name>Image To ZX Spec</name>
     <description>Image converter for the ZX Spectrum</description>
     <licenses>
@@ -144,15 +144,6 @@
             </plugin>
         </plugins>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
-            </plugin>
-        </plugins>
-    </reporting>
     <dependencyManagement>
         <dependencies>
             <dependency>

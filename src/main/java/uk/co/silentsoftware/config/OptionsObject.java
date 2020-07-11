@@ -88,13 +88,6 @@ public class OptionsObject {
 	private volatile boolean turboMode = false;
 
 	/**
-	 * Interlace colour needs to average two lines of pixels. The 3D colourspace correct way is
-	 * to use a square root average, but it seems just regular averaging is better for the ZX.
-	 */
-	@PreferencesField
-	private volatile boolean colourSpaceAveraging = false;
-
-	/**
 	 * Prefix identifier for custom basic loaders
 	 */
 	public final static String CUSTOM_LOADER_PREFIX = getCaption("loader_custom") + " ";
@@ -744,14 +737,6 @@ public class OptionsObject {
 
 	public void setGigaScreenPaletteOrder(GigaScreenPaletteOrder gigaScreenAttributeOrderingOption) {
 		this.gigaScreenPaletteOrder = gigaScreenAttributeOrderingOption.name();
-	}
-
-	public boolean getColourspaceAveraging() {
-		return colourSpaceAveraging;
-	}
-
-	public void setColourspaceAveraging(boolean colourSpaceAveraging) {
-		this.colourSpaceAveraging = colourSpaceAveraging;
 	}
 
 	public ColourDistanceStrategy getColourDistanceMode() {

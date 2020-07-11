@@ -57,8 +57,8 @@ class CoffeeDialog {
 					"budget so please consider a contribution of any amount!<br>" +
 					"<h3><a href='" + COFFEE_LINK + "'>Buy the developer a coffee</a></h3>" +
 					"This popup will now continue to show on each start should you want to buy a<br>" +
-					"a coffee later. Incidentally, if you read this far, clicking the buy the developer a<br>" +
-					"coffee link will also disable this popup in future.<br><br>" +
+					"a coffee later. Incidentally, if you read this far, just clicking the buy the<br>" +
+					"developer a coffee link will disable this popup in future.<br><br>" +
 					"<b>Thank you in advance for your support.</b>");
 			aboutField.putClientProperty(JTextPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 			aboutField.setEditable(false);
@@ -73,7 +73,6 @@ class CoffeeDialog {
 			});
 			JOptionPane.showMessageDialog(null, aboutField, "Information", JOptionPane.INFORMATION_MESSAGE, ImageToZxSpec.IMAGE_ICON);
 		}
-
 		PreferencesService.save();		
 	}
 	
