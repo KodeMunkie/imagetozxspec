@@ -27,7 +27,7 @@ import uk.co.silentsoftware.core.converters.image.processors.GigaScreenAttribute
  */
 public class SpectrumDefaults {
 
-	private static final int UNIQUE_COLOURS_THRESHOLD = 4;
+	private static final int UNIQUE_COLOURS_THRESHOLD = 3;
 
 	/**
 	 * The size of Spectrum the colour "blocks" (8x8 pixels default)
@@ -329,9 +329,12 @@ public class SpectrumDefaults {
 					for (int paperScreen2 : palette2) {	
 						GigaScreenAttribute gc = new GigaScreenAttribute(inkScreen1, paperScreen1, inkScreen2, paperScreen2);
 						
-						// Only use those attributes that have 4 colours otherwise we don't get
+						// Only use those attributes that have 3+ colours otherwise we don't get
 						// maximum benefit from this screenmode
-						if (gc.getUniqueColourCount() == UNIQUE_COLOURS_THRESHOLD) {
+						// Nb. used to be 4 colour threshold however colour quantisation/distance/attribute calcuations
+						// seem to benefit where very same colours appear multiple times within 8x8 pixels (this is
+						// subjective however I think it's important enough to adjust).
+						if (gc.getUniqueColourCount() >= UNIQUE_COLOURS_THRESHOLD) {
 							combos.add(gc);
 						}
 					}

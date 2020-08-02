@@ -16,6 +16,7 @@
  */
 package uk.co.silentsoftware.core.converters.image.processors;
 
+import org.apache.commons.lang3.StringUtils;
 import uk.co.silentsoftware.core.helpers.ColourHelper;
 
 import java.util.Set;
@@ -57,7 +58,7 @@ public class GigaScreenAttribute {
 	// colour for each screen, separate RGB values)
 	private GigaScreenColour[] gigaScreenColours = new GigaScreenColour[4];
 	private int uniqueColourCount;
-	private String uniqueHash;
+	private String uniqueHash = StringUtils.EMPTY;
 
 	/**
 	 * Constructor for a GigaScreenAttribute
@@ -136,7 +137,10 @@ public class GigaScreenAttribute {
 
 			int[] rgbS1 = ColourHelper.intToRgbComponents(screen1Colour);
 			int[] rgbS2 = ColourHelper.intToRgbComponents(screen2Colour);
-			gigascreenColour = ColourHelper.componentsToAlphaRgb((rgbS1[0] + rgbS2[0]) / 2, (rgbS1[1] + rgbS2[1]) / 2, (rgbS1[2] + rgbS2[2]) / 2);
+			gigascreenColour = ColourHelper.componentsToAlphaRgb(
+					(int)(((long)rgbS1[0] + (long)rgbS2[0]) / 2l),
+					(int)(((long)rgbS1[1] + (long)rgbS2[1]) / 2l),
+					(int)(((long)rgbS1[2] + (long)rgbS2[2]) / 2l));
 			gigascreenColourRGB = ColourHelper.intToRgbComponents(gigascreenColour);
 		}
 
