@@ -32,6 +32,7 @@ display images on a standard 128K machine in new screen modes that
 weren't available during the machine's heyday (such as 102 colours high 
 resolution).
 
+
 ### Installation/Usage
 If you have Java installed just double click the Img2ZXSpec.jar
 file (like you would a regular .exe file). If you don't have Java
@@ -84,7 +85,6 @@ is enabled. Disabling this option may provide a small improvement to the
 conversion performance.
 
 #### Output Options
-
 * SCR (.scr/screen)
 This is the file format representing a snapshot of a real Spectrum's
 graphics memory area. This is not much use without a special file 
@@ -118,6 +118,7 @@ As a general rule of thumb if you are converting video set the value
 to 1000 ÷ "Video Sampling Rate" option found on the pre-processing tab, 
 e.g. if the video sample rate is 10 then the anim gif frame delay should 
 be 100.
+
 
 ### Pre-Process Options Tab
 These are basic options to allow you to improve the source image or video
@@ -166,13 +167,13 @@ In general, the "Low Error Atkinson" (or "Atkinson") and "Magic Square 4x4
 (Nasik)" tend to be the best monochrome and colour modes respectively, 
 although you may need to enable some pre-processing options such as 
 contrast change to get the best results especially for the non 
-Ordered/Magic dithers. To see a preview of all dithering modes choose "View 
+Ordered/Magic dithers. The character converter dither attempts to map the 
+graphics to the ZX spectrum character set and tends to work best with pictures 
+that are not "busy" and have high contrast.
+To see a preview of all dithering modes choose "View 
 Dither Options" from the Options tool bar drop list. Note that if you are 
 converting video then the preview will show a random frame from the first
 few seconds.
-The character converter dither which attempts to map the graphics to the ZX 
-spectrum character set, this tends to work best with pictures that are not 
-"busy" and have high contrast.
 
 #### Colour Mode
 Choose whether to have two colour dithered images "Monochrome", "Full Palette" 
@@ -181,10 +182,10 @@ to generate 102 colours. GigaScreen works on a real Spectrum by flashing two
 specially created images in sequence, the "blur" (persistence of vision) 
 produces the extra colours. The file representation a Spectrum "scr" file is
 is two regular scr images saved as one file. As a jpg or png file these are 
-represented as the actual colours. FatWare has the the capability to display 
-these images on a real Spectrum, however there is a GigaScreen loader included
-(see General Options, Tape/Slideshow/Video Loader above) but this is not 
-recommended as it is a very poor and flickery solution.
+represented as the actual colours. FatWare DivIDE firmware has the the capability 
+to display these images on a real Spectrum, if you don't have that, there is a 
+GigaScreen loader included (see General Options, Tape/Slideshow/Video Loader above) 
+but this is not  recommended as it is a very poor and flickery solution.
 Monochrome mode tends to make detail much easier to see but with the obvious 
 colour sacrifice. Monochrome conversion tends to be at least 3 times faster 
 than colour mode conversion.
@@ -264,13 +265,13 @@ reduce attribute artifact edges.
 
 #### Colour Distance Algorithm
 When making a decision on which Spectrum colours best match those of the source 
-image's pixels an evaluation based is done based on a colour space "distance".
+image's pixels a colour space "distance" is evaluated.
 The choice of algorithm for this evaluation is configured here - typically
 the Compuphase algorithm is the best and uses heuristics based on human vision,
 the classic Image to ZX Spec algorithm next (which is just a simple sum of RGB space distances), 
 followed by the Euclidean which is the straight line distance in RGB space. You may find
 any one of these better suits your use case, typically the latter two are interchangeable however
-classic tends to occasionally favour darker colours which can lead to better results.s
+classic tends to occasionally favour darker colours which can lead to better results.
 
 #### Video Import Engine
 By default Image to ZX Spec's uses HumbleVideo which is fast platform native video
@@ -287,10 +288,10 @@ In simple terms the processing is devoted to video processing when it is switche
 resulting in a stuttering real time preview. When it is switched off - the recommended
 setting - more processing is devoted to the real time preview.
 
+
 ### FAQ
 
 #### My video won't convert!
-
 By default Humble Video is used to decode videos. In some cases it may not be
 compatible with your video's encoding, you can instead use the slower VLC plugin.
 Under the Advanced Options tab choose VLC from the Video Import Engine drop 
