@@ -31,10 +31,7 @@ import uk.co.silentsoftware.core.converters.image.orderedditherstrategy.*;
 import uk.co.silentsoftware.core.converters.video.HumbleVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VLCVideoImportEngine;
 import uk.co.silentsoftware.core.converters.video.VideoImportEngine;
-import uk.co.silentsoftware.core.helpers.colourdistance.ClassicColourDistanceStrategy;
-import uk.co.silentsoftware.core.helpers.colourdistance.ColourDistanceStrategy;
-import uk.co.silentsoftware.core.helpers.colourdistance.CompuphaseColourDistanceStrategy;
-import uk.co.silentsoftware.core.helpers.colourdistance.EuclideanColourDistance;
+import uk.co.silentsoftware.core.helpers.colourdistance.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -246,6 +243,7 @@ public class OptionsObject {
 	private final List<ColourDistanceStrategy> colourDistancesModes;
 	{
 		colourDistancesModes = new ArrayList<>();
+		colourDistancesModes.add(new LuminanceColourDistance());
 		colourDistancesModes.add(new CompuphaseColourDistanceStrategy());
 		colourDistancesModes.add(new ClassicColourDistanceStrategy());
 		colourDistancesModes.add(new EuclideanColourDistance());
