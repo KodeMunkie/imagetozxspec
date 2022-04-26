@@ -2,7 +2,7 @@ Image To ZX Spectrum 2.2.1
 --------------------------
 
 ### Legal / Disclaimer
-This software is copyright Silent Software (Benjamin Brown) 2020 and
+This software is copyright Silent Software (Benjamin Brown) 2022 and
 is licensed under the GNU AGPLv3. Please see the included licenses.txt 
 for more details.
 
