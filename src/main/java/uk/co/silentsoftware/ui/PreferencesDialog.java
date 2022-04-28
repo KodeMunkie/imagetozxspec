@@ -1,5 +1,5 @@
 /* Image to ZX Spec
- * Copyright (C) 2020 Silent Software (Benjamin Brown)
+ * Copyright (C) 2022 Silent Software (Benjamin Brown)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License
@@ -128,7 +128,6 @@ class PreferencesDialog extends JFrame  {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(6,2));
 		JLabel label = new JLabel(getCaption("pp_scaling"), JLabel.CENTER);
-		final JPanel scalingPadding = new JPanel(new GridLayout(3,1));
 		scaling = new JComboBox<>(oo.getScalings());
 		scaling.setSelectedItem(oo.getScaling());
 		scaling.addActionListener(event -> {
@@ -137,14 +136,9 @@ class PreferencesDialog extends JFrame  {
             PreferencesService.save();
         });
 		panel.add(label);
-		// TODO: this is a bit lame and Java 1.1 style using padding like this
-		scalingPadding.add(new JPanel());
-		scalingPadding.add(scaling);
-		scalingPadding.add(new JPanel());
-		panel.add(scalingPadding);
+		panel.add(scaling);
 		label = new JLabel(getCaption("pp_video_rate"), JLabel.CENTER);
 		final JTextField sampleRate = new JTextField();
-		final JPanel samplePadding = new JPanel(new GridLayout(3,1));
 		sampleRate.setHorizontalAlignment(JTextField.RIGHT);
 		sampleRate.setText(""+oo.getVideoFramesPerSecond());
 		sampleRate.addFocusListener(new FocusAdapter() {
@@ -168,10 +162,7 @@ class PreferencesDialog extends JFrame  {
 			}
 		});
 		panel.add(label);
-		samplePadding.add(new JPanel());
-		samplePadding.add(sampleRate);
-		samplePadding.add(new JPanel());
-		panel.add(samplePadding);
+		panel.add(sampleRate);
 		label = new JLabel(getCaption("pp_saturation"), JLabel.CENTER);
 		final JSlider satSlider = new JSlider(-100, 100);
 		satSlider.setMajorTickSpacing(25);
@@ -220,12 +211,8 @@ class PreferencesDialog extends JFrame  {
             contrastSlider.setValue(0);
             satSlider.setValue(0);
         });
-		final JPanel resetPadding = new JPanel(new GridLayout(3,1));
-		resetPadding.add(new JPanel());
-		resetPadding.add(button);
-		resetPadding.add(new JPanel());
 		panel.add(label);
-		panel.add(resetPadding);
+		panel.add(button);
 
 		return panel;
 	}
@@ -238,7 +225,7 @@ class PreferencesDialog extends JFrame  {
 	private JPanel createAdvancedOptions() {
 		final OptionsObject oo = OptionsObject.getInstance();
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(7,2));
+		panel.setLayout(new GridLayout(6,2));
 		JLabel label = new JLabel(getCaption("adv_serpentine"), JLabel.CENTER);
 		final JCheckBox serpentine = new JCheckBox();
 		serpentine.setSelected(oo.getSerpentine());
@@ -281,12 +268,8 @@ class PreferencesDialog extends JFrame  {
 		final JComboBox<VideoImportEngine> importEngine = new JComboBox<>(oo.getVideoImportEngines());
 		importEngine.setSelectedItem(oo.getVideoImportEngine());
 		importEngine.addActionListener(createImportEngineActionListener(importEngine));
-		final JPanel importPadding = new JPanel(new GridLayout(3,1));
-		importPadding.add(new JPanel());
-		importPadding.add(importEngine);
-		importPadding.add(new JPanel());
 		panel.add(label);
-		panel.add(importPadding);
+		panel.add(importEngine);
 		
 
 		label = new JLabel(getCaption("adv_video_turbo"), JLabel.CENTER);
@@ -454,7 +437,7 @@ class PreferencesDialog extends JFrame  {
 	private JPanel createGeneralOptions() {
 		final OptionsObject oo = OptionsObject.getInstance();
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(11,2));
+		panel.setLayout(new GridLayout(10,2));
 		JLabel label = new JLabel(getCaption("misc_image_output"), JLabel.CENTER);
 		panel.add(label);
 		final JComboBox<String> formatsBox = new JComboBox<>(oo.getImageFormats());
