@@ -1,4 +1,4 @@
-Image To ZX Spectrum 2.2.1
+Image To ZX Spectrum 2.2.2
 --------------------------
 
 ### Legal / Disclaimer

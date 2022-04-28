@@ -16,12 +16,10 @@
  */
 package uk.co.silentsoftware.core.converters.video;
 
-import cz.adamh.utils.NativeUtils;
 import io.humble.video.*;
 import io.humble.video.MediaDescriptor.Type;
 import io.humble.video.awt.MediaPictureConverter;
 import io.humble.video.awt.MediaPictureConverterFactory;
-import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.silentsoftware.config.OptionsObject;
@@ -29,7 +27,6 @@ import uk.co.silentsoftware.config.OptionsObject;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 /**

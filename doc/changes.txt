@@ -1,6 +1,13 @@
 Image to ZX Spec Changes
 ------------------------
 
+Version 2.2.2
+- Fixed Java 17 compatibility
+- Removed hacks for native lib loading
+- Removed hacks for UI layout
+- Updated many dependency libraries
+- Updated Copyrights
+
 Version 2.2.1
 - Improved interlaced 256x384 output (fewer bad palette choices).
 - Removed interlaced screen colour averaging options.
