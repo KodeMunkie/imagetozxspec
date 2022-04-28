@@ -121,12 +121,21 @@
                         </filter>
                     </filters>
                     <transformers>
-                        <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>uk.co.silentsoftware.ui.ImageToZxSpec</mainClass>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Main-Class>uk.co.silentsoftware.ui.ImageToZxSpec</Main-Class>
+                                <Specification-Title>${project.artifactId}</Specification-Title>
+                                <Specification-Version>${project.version}</Specification-Version>
+                                <Implementation-Title>${project.artifactId}</Implementation-Title>
+                                <Implementation-Version>${project.version}</Implementation-Version>
+                                <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+                                <Humble-Native-App>humble-video</Humble-Native-App>
+                                <Humble-Native-Root>.</Humble-Native-Root>
+                                <Humble-Native-Paths>.</Humble-Native-Paths>
+                                <Humble-Native-Bundles>${humble-lib}</Humble-Native-Bundles>
+                            </manifestEntries>
                         </transformer>
                     </transformers>
-
                 </configuration>
             </plugin>
 
@@ -293,6 +302,9 @@
         </profile>
         <profile>
             <id>windows-x64</id>
+            <properties>
+                <humble-lib>x86_64-w64-mingw32</humble-lib>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>io.humble</groupId>
@@ -303,6 +315,9 @@
         </profile>
         <profile>
             <id>macos-x64</id>
+            <properties>
+                <humble-lib>x86_64-apple-darwin18</humble-lib>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>io.humble</groupId>
@@ -313,6 +328,9 @@
         </profile>
         <profile>
             <id>linux-x64</id>
+            <properties>
+                <humble-lib>x86_64-pc-linux-gnu6</humble-lib>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>io.humble</groupId>
@@ -323,6 +341,9 @@
         </profile>
         <profile>
             <id>windows-x86</id>
+            <properties>
+                <humble-lib>i686-w64-mingw32</humble-lib>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>io.humble</groupId>
@@ -333,6 +354,9 @@
         </profile>
         <profile>
             <id>linux-x86</id>
+            <properties>
+                <humble-lib>i686-pc-linux-gnu6</humble-lib>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>io.humble</groupId>

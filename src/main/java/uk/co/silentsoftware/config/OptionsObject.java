@@ -414,8 +414,6 @@ public class OptionsObject {
 		} else {
 			instance = new OptionsObject();
 		}
-		// Start this early as some engines take a number of seconds to load
-		instance.getVideoImportEngine().initVideoImportEngine(Optional.ofNullable(instance.getPathToVideoEngineLibrary()));
 		log.info("Options initialised");
 	}
 	

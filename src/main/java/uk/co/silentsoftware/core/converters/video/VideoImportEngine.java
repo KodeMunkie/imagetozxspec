@@ -41,11 +41,4 @@ public interface VideoImportEngine {
 	 * Cancels the frame extraction
 	 */
 	void cancel();
-
-	/**
-	 * Initialises the video import engine with optional native library path
-	 * 
-	 * @param pathToLibrary path to a native library for decoding (implementation specific)
-	 */
-	void initVideoImportEngine(Optional<String> pathToLibrary);
 }

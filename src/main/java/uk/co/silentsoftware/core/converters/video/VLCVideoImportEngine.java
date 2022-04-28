@@ -166,17 +166,4 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 	public void cancel() {
 		this.cancel = true;
 	}
-	
-	/*
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void initVideoImportEngine(Optional<String> pathToLibrary) {
-		if (!pathToLibrary.isPresent()) {
-			return;
-		}
-		log.debug("Path to library {}", pathToLibrary);
-		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), pathToLibrary.get());
-		log.debug("Library loaded");
-	}
 }

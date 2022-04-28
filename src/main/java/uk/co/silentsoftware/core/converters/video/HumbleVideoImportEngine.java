@@ -164,46 +164,4 @@ public class HumbleVideoImportEngine implements VideoImportEngine {
 	public String toString() {
 		return "Humble Video";
 	}
-
-	/*
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void initVideoImportEngine(Optional<String> pathToLibrary) {
-		if (pathToLibrary.isEmpty()) {
-			return;
-		}
-		Thread t = new Thread(() -> {
-            try {
-                log.debug("Path to library {}", pathToLibrary);
-                if (SystemUtils.IS_OS_WINDOWS) {
-                    log.debug("Windows OS");
-					NativeUtils.loadLibraryFromJar("libhumblevideo-0.dll");
-                } else if (SystemUtils.IS_OS_MAC_OSX) {
-                    log.debug("Mac OS");
-					NativeUtils.loadLibraryFromJar("libhumblevideo.dylib");
-                } else if (SystemUtils.IS_OS_LINUX) {
-                    log.debug("Linux OS");
-					NativeUtils.loadLibraryFromJar("libhumblevideo.so");
-                } else {
-                    log.error("Unknown OS");
-                    throw new IllegalStateException("Unable to determine OS");
-                }
-                /*
-                  Effectively refreshing the library path "stirs the tanks" and preloads the library
-                  before its actual usage by JNI in humble video - note the loadClass doesn't actually
-                  need doing manually but if we don't the initialisation later of the video decoder
-                  is delayed by 5 to 10 seconds and the UI may appear to be frozen.
-                 */
-                ClassLoader.getSystemClassLoader().loadClass("io.humble.ferry.FerryJNI").getDeclaredConstructor().newInstance();
-            } catch (Throwable t1) {
-                log.error("Unable to load native library", t1);
-            }
-        });
-		t.setDaemon(true);
-		// This method is usually quite CPU intensive and can even block the GUI rendering 
-		// despite being in another thread so ensure it is minimum priority
-		t.setPriority(Thread.MIN_PRIORITY);
-		t.start();		
-	}
 }
