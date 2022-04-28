@@ -310,28 +310,6 @@ class PreferencesDialog extends JFrame  {
 	 */
 	private ActionListener createImportEngineActionListener(JComboBox<VideoImportEngine> importEngine) {
 		return event -> {
-            if (importEngine.getSelectedItem() instanceof VLCVideoImportEngine) {
-                try {
-                    JFileChooser jfc = new JFileChooser();
-                    jfc.setDialogTitle(getCaption("dialog_choose_vlc_folder"));
-                    jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                    if (JFileChooser.APPROVE_OPTION == jfc.showOpenDialog(null)) {
-                        String path = jfc.getSelectedFile().getAbsolutePath();
-                        ((VideoImportEngine)importEngine.getSelectedItem()).initVideoImportEngine(Optional.of(path));
-                        OptionsObject.getInstance().setPathToVideoEngineLibrary(path);
-                        JOptionPane.showMessageDialog(null, getCaption("adv_video_vlc_success"), getCaption("adv_video_vlc_success_title"), JOptionPane.INFORMATION_MESSAGE);
-                    } else {
-                        throw new IllegalArgumentException("File not selected");
-                    }
-                } catch (Throwable t) {
-                    log.warn("Unable to choose VLC path",t);
-                    JOptionPane.showMessageDialog(null, getCaption("adv_video_vlc_fail"), getCaption("adv_video_vlc_fail_title"), JOptionPane.WARNING_MESSAGE);
-
-                    // TODO: Fix this hack - I just need to set a safe default so chose the first
-                    importEngine.setSelectedItem(OptionsObject.getInstance().getVideoImportEngines()[0]);
-                    return;
-                }
-            }
             OptionsObject.getInstance().setVideoImportEngine((VideoImportEngine)importEngine.getSelectedItem());
             PreferencesService.save();
         };

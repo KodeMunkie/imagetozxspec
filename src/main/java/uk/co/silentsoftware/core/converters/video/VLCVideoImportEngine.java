@@ -16,9 +16,15 @@
  */
 package uk.co.silentsoftware.core.converters.video;
 
-import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
+import com.sun.jna.NativeLibrary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.co.caprica.vlcj.binding.RuntimeUtil;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
-import java.awt.Image;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
@@ -26,18 +32,7 @@ import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JWindow;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
-
-import uk.co.caprica.vlcj.binding.LibVlc;
-import uk.co.caprica.vlcj.binding.RuntimeUtil;
-import uk.co.caprica.vlcj.player.base.MediaPlayer;
-import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
+import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 
 /**
  * VLCJ wrapper for platform native video decoding.
@@ -65,7 +60,11 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 	 * is no other way unless the VLC UI is displayed).
 	 */
 	private static final int MEDIA_PRELOAD_WAIT = (int)TimeUnit.SECONDS.toMillis(2);
-	
+
+	/**
+	 * Amount of before media load fails
+	 */
+	private static final int MEDIA_PRELOAD_TIMEOUT = MEDIA_PRELOAD_WAIT * 5;
 	private volatile boolean cancel = false;
 	
 	/**
@@ -75,10 +74,9 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 	 * @param f the video file
 	 * @param singleImage whether just a single preview image is required
 	 * @param sharedQueue the shared processing queue
-	 * @throws IOException if there is a problem loading the media file
 	 * @throws InterruptedException if loading is interupted
 	 */
-	public void convertVideoToImages(File f, boolean singleImage, final BlockingQueue<Image> sharedQueue, VideoLoadedLock videoLoadedLock) throws IOException, InterruptedException {
+	public void convertVideoToImages(File f, boolean singleImage, final BlockingQueue<Image> sharedQueue, VideoLoadedLock videoLoadedLock) throws InterruptedException {
 		EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
 		JWindow frame = new JWindow();
 		frame.setBounds(0,0,1,1);
@@ -88,7 +86,9 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 		player.audio().mute();
 		player.media().play(f.getAbsolutePath());
 		long len = player.media().info().duration();
-		if (len == 0) {
+		int preloadWait = 0;
+		while (len == -1 && preloadWait<MEDIA_PRELOAD_TIMEOUT) {
+			preloadWait += MEDIA_PRELOAD_TIMEOUT;
 			Thread.sleep(MEDIA_PRELOAD_WAIT);
 			len = player.media().info().duration();
 		}
@@ -122,10 +122,15 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 				}
 			}
 		} finally {
-			player.controls().stop();
-			player.release();
-			mediaPlayerComponent.release();
-			cancel = false;
+			try {
+				player.controls().stop();
+				player.release();
+				mediaPlayerComponent.release();
+				cancel = false;
+			} catch (Error e) {
+				// Thrown from release on Win64 for an unknown reason
+				log.warn("Error stopping/releasing video", e);
+			}
 		}
 	}
 	
