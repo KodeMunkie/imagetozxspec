@@ -43,9 +43,7 @@ import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
  * and controls the state of the workmanager.
  */
 public class ImageToZxSpec {
-
 	private static final Logger log = LoggerFactory.getLogger(ImageToZxSpec.class);
-
 	private static final String BUILD_VERSION = BuildProperties.getProperty("version");
 	private static final String NAME_COPYRIGHT = "Image to ZX Spec "+BUILD_VERSION+" © Silent Software 2020";
 	public static final ImageIcon IMAGE_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/logo.png"));

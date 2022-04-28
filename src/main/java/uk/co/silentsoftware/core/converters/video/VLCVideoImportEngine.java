@@ -20,8 +20,11 @@ import com.sun.jna.NativeLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
+import uk.co.caprica.vlcj.media.MediaEventListener;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import uk.co.caprica.vlcj.player.component.AudioPlayerComponent;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
+import uk.co.silentsoftware.ui.ImageToZxSpec;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,15 +59,15 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 	private static final int RANDOM_INTRO_WAIT = (int)TimeUnit.SECONDS.toMillis(5);
 	
 	/**
-	 * Amount of time to wait between checks to see if the video has loaded (there
+	 * Amount of time in millis to wait between checks to see if the video has loaded (there
 	 * is no other way unless the VLC UI is displayed).
 	 */
-	private static final int MEDIA_PRELOAD_WAIT = (int)TimeUnit.SECONDS.toMillis(2);
+	private static final int MEDIA_PRELOAD_WAIT = 100;
 
 	/**
-	 * Amount of before media load fails
+	 * Amount of time in millis before media load fails
 	 */
-	private static final int MEDIA_PRELOAD_TIMEOUT = MEDIA_PRELOAD_WAIT * 5;
+	private static final int MEDIA_PRELOAD_TIMEOUT = MEDIA_PRELOAD_WAIT * 20;
 	private volatile boolean cancel = false;
 	
 	/**
@@ -83,15 +86,25 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 		frame.add(mediaPlayerComponent);
 		frame.setVisible(true);
 		final MediaPlayer player = mediaPlayerComponent.mediaPlayer();
-		player.audio().mute();
 		player.media().play(f.getAbsolutePath());
-		long len = player.media().info().duration();
+		player.media().events().addMediaEventListener(new AudioPlayerComponent() {
+			boolean isMuted = false;
+			@Override
+			public void playing(MediaPlayer mediaPlayer) {
+				super.playing(mediaPlayer);
+				if (!isMuted) {
+					isMuted = this.mediaPlayer().audio().mute();
+				}
+			}
+		});
+		// TODO: Following can be done with listeners now but I'm only patching this up for Java17+new VLC4J for now.
 		int preloadWait = 0;
-		while (len == -1 && preloadWait<MEDIA_PRELOAD_TIMEOUT) {
-			preloadWait += MEDIA_PRELOAD_TIMEOUT;
+		while(!mediaPlayerComponent.mediaPlayer().status().isPlaying() && preloadWait < MEDIA_PRELOAD_TIMEOUT)
+		{
+			preloadWait += MEDIA_PRELOAD_WAIT;
 			Thread.sleep(MEDIA_PRELOAD_WAIT);
-			len = player.media().info().duration();
 		}
+		long len = player.media().info().duration();
 		int singleImageSelectionTime = -1;
 		if (singleImage) {
 			singleImageSelectionTime = new Random().nextInt(RANDOM_INTRO_WAIT) + MINIMUM_INTRO_WAIT;
@@ -104,6 +117,10 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 		videoLoadedLock.preloadFinished();
 		try {
 			while (player.status().time() < len) {
+				// Best effort :(
+				if (!player.audio().isMute()) {
+					player.audio().mute();
+				}
 				if (cancel) {
 					break;
 				}
