@@ -16,38 +16,26 @@
  */
 package uk.co.silentsoftware.core.converters.video;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
-import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-
+import cz.adamh.utils.NativeUtils;
+import io.humble.video.*;
+import io.humble.video.MediaDescriptor.Type;
+import io.humble.video.awt.MediaPictureConverter;
+import io.humble.video.awt.MediaPictureConverterFactory;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.humble.video.Decoder;
-import io.humble.video.Demuxer;
-import io.humble.video.DemuxerStream;
-import io.humble.video.Global;
-import io.humble.video.MediaDescriptor.Type;
-import io.humble.video.MediaPacket;
-import io.humble.video.MediaPicture;
-import io.humble.video.Rational;
-import io.humble.video.awt.MediaPictureConverter;
-import io.humble.video.awt.MediaPictureConverterFactory;
 import uk.co.silentsoftware.config.OptionsObject;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 
 /**
  * Video decoding class based on the rather obtuse example at 
  * 
- * https://github.com/artclarke/humble-video/blob/master/humble-video-demos/src/main/java/io/humble/video/demos/DecodeAndPlayVideo.java
+ * <a href="https://github.com/artclarke/humble-video/blob/master/humble-video-demos/src/main/java/io/humble/video/demos/DecodeAndPlayVideo.java">https://github.com/artclarke/humble-video/blob/master/humble-video-demos/src/main/java/io/humble/video/demos/DecodeAndPlayVideo.java</a>
  */
 public class HumbleVideoImportEngine implements VideoImportEngine {
 
@@ -182,18 +170,21 @@ public class HumbleVideoImportEngine implements VideoImportEngine {
 	 */
 	@Override
 	public void initVideoImportEngine(Optional<String> pathToLibrary) {
+		if (pathToLibrary.isEmpty()) {
+			return;
+		}
 		Thread t = new Thread(() -> {
             try {
                 log.debug("Path to library {}", pathToLibrary);
                 if (SystemUtils.IS_OS_WINDOWS) {
                     log.debug("Windows OS");
-                    exposeNativeLibrary("libhumblevideo-0.dll");
+					NativeUtils.loadLibraryFromJar("libhumblevideo-0.dll");
                 } else if (SystemUtils.IS_OS_MAC_OSX) {
                     log.debug("Mac OS");
-                    exposeNativeLibrary("libhumblevideo.dylib");
+					NativeUtils.loadLibraryFromJar("libhumblevideo.dylib");
                 } else if (SystemUtils.IS_OS_LINUX) {
                     log.debug("Linux OS");
-                    exposeNativeLibrary("libhumblevideo.so");
+					NativeUtils.loadLibraryFromJar("libhumblevideo.so");
                 } else {
                     log.error("Unknown OS");
                     throw new IllegalStateException("Unable to determine OS");
@@ -204,7 +195,7 @@ public class HumbleVideoImportEngine implements VideoImportEngine {
                   need doing manually but if we don't the initialisation later of the video decoder
                   is delayed by 5 to 10 seconds and the UI may appear to be frozen.
                  */
-                ClassLoader.getSystemClassLoader().loadClass("io.humble.ferry.FerryJNI").newInstance();
+                ClassLoader.getSystemClassLoader().loadClass("io.humble.ferry.FerryJNI").getDeclaredConstructor().newInstance();
             } catch (Throwable t1) {
                 log.error("Unable to load native library", t1);
             }
@@ -214,56 +205,5 @@ public class HumbleVideoImportEngine implements VideoImportEngine {
 		// despite being in another thread so ensure it is minimum priority
 		t.setPriority(Thread.MIN_PRIORITY);
 		t.start();		
-	}	
-	
-	/**
-	 * Java cannot load native libraries from jars so we need to expose the library
-	 * first by copying it to an external folder and then refreshing the Java library path.
-	 * 
-	 * @param resourceName the name of the library resource to expose
-	 * @return whether the library was successfully exposed
-	 */
-	private boolean exposeNativeLibrary(String resourceName) {
-		try {
-			Path tempDir = Files.createTempDirectory("native-", new FileAttribute[0]);
-			log.debug("Resource name: {}", resourceName);
-			copyLibraryResources(tempDir, resourceName);
-			refreshLibraryPath(tempDir);
-		} catch (Throwable t) {
-			log.warn("Unable to expose library {}", resourceName, t);
-			return false;
-		}
-		return true;
-	}
-	
-	/**
-	 * Copies the given jar resource into the temporary directory
-	 * 
-	 * @param tempDir the temporary directory from which to load the native library
-	 * @param resourceName the resource name to get from the jar
-	 * @throws IOException if the library copy fails
-	 */
-	private void copyLibraryResources(Path tempDir, String resourceName) throws IOException {
-		String fileSeparator = System.getProperty("file.separator");
-		try (InputStream in = ClassLoader.getSystemResourceAsStream(resourceName)) {
-			Files.copy(in, new File(tempDir.toFile().getAbsolutePath()+fileSeparator+resourceName).toPath());
-		}
-	}
-
-	/**
-	 * Refreshes the Java library path
-	 * 
-	 * @param tempDir the temporary directory containing the libraries we want to add
-	 * 
-	 * @throws IllegalAccessException if the classloader cannot be reset
-	 * @throws NoSuchFieldException if the classloader's system path field is not accessible
-	 */
-	private void refreshLibraryPath(Path tempDir) throws IllegalAccessException, NoSuchFieldException, SecurityException {
-		String pathSeparator = System.getProperty("path.separator");
-		String oldPath = System.getProperty("java.library.path");
-		System.setProperty("java.library.path",  oldPath+pathSeparator+tempDir.toFile().getAbsolutePath());
-		Field sysPaths = ClassLoader.class.getDeclaredField("sys_paths");
-		sysPaths.setAccessible(true);
-		sysPaths.set(null,  null);
 	}
 }

@@ -35,9 +35,9 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
 import uk.co.caprica.vlcj.binding.LibVlc;
-import uk.co.caprica.vlcj.component.EmbeddedMediaPlayerComponent;
-import uk.co.caprica.vlcj.player.MediaPlayer;
-import uk.co.caprica.vlcj.runtime.RuntimeUtil;
+import uk.co.caprica.vlcj.binding.RuntimeUtil;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 /**
  * VLCJ wrapper for platform native video decoding.
@@ -84,13 +84,13 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 		frame.setBounds(0,0,1,1);
 		frame.add(mediaPlayerComponent);
 		frame.setVisible(true);
-		final MediaPlayer player = mediaPlayerComponent.getMediaPlayer();
-		player.mute();
-		player.playMedia(f.getAbsolutePath());
-		long len = player.getLength();
+		final MediaPlayer player = mediaPlayerComponent.mediaPlayer();
+		player.audio().mute();
+		player.media().play(f.getAbsolutePath());
+		long len = player.media().info().duration();
 		if (len == 0) {
 			Thread.sleep(MEDIA_PRELOAD_WAIT);
-			len = player.getLength();
+			len = player.media().info().duration();
 		}
 		int singleImageSelectionTime = -1;
 		if (singleImage) {
@@ -100,10 +100,10 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 			}
 		}
 		frame.setVisible(false);
-		log.debug("Player time: {}, Len: {}", player.getTime(), len);
+		log.debug("Player time: {}, Len: {}", player.status().time(), len);
 		videoLoadedLock.preloadFinished();
 		try {
-			while (player.getTime() < len) {
+			while (player.status().time() < len) {
 				if (cancel) {
 					break;
 				}
@@ -111,18 +111,18 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 				// Always add images if we don't want a single preview
 				// image or when the time exceeds the point we want a
 				// single image from
-				if (singleImageSelectionTime == -1 || player.getTime() >= singleImageSelectionTime) {
-					sharedQueue.add(player.getSnapshot());
+				if (singleImageSelectionTime == -1 || player.status().time() >= singleImageSelectionTime) {
+					sharedQueue.add(player.snapshots().get());
 	
 					// We only want one image if single image selection
 					// is turned on
-					if (singleImageSelectionTime != -1 && player.getTime() >= singleImageSelectionTime) {
+					if (singleImageSelectionTime != -1 && player.status().time() >= singleImageSelectionTime) {
 						break;
 					}
 				}
 			}
 		} finally {
-			player.stop();
+			player.controls().stop();
 			player.release();
 			mediaPlayerComponent.release();
 			cancel = false;
@@ -150,11 +150,11 @@ public class VLCVideoImportEngine implements VideoImportEngine {
 	 */
 	@Override
 	public void initVideoImportEngine(Optional<String> pathToLibrary) {
-		if (pathToLibrary.isPresent()) {
-			log.debug("Path to library {}", pathToLibrary);
-			NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), pathToLibrary.get());
-			Native.loadLibrary(RuntimeUtil.getLibVlcLibraryName(), LibVlc.class);
-			log.debug("Library loaded");
+		if (!pathToLibrary.isPresent()) {
+			return;
 		}
+		log.debug("Path to library {}", pathToLibrary);
+		NativeLibrary.addSearchPath(RuntimeUtil.getLibVlcLibraryName(), pathToLibrary.get());
+		log.debug("Library loaded");
 	}
 }
