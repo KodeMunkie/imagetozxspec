@@ -84,6 +84,11 @@ public class ImageToZxSpec {
 	private static final JFrame frame = new JFrame(NAME_COPYRIGHT);
 
 	/**
+	 * The main preview panel
+	 */
+	private static Panel renderPanel;
+
+	/**
 	 * The status box
 	 */
 	private static JTextField statusBox = null;
@@ -167,8 +172,9 @@ public class ImageToZxSpec {
 		// Add the standard toolbar
 		frame.getContentPane().add(createToolbar(), BorderLayout.PAGE_START);
 		
-		// Add the panel for rendering the original + result
-		frame.getContentPane().add(createRenderPanel(), BorderLayout.CENTER);
+		// Add the panel for rendering the original +
+		renderPanel = createRenderPanel();
+		frame.getContentPane().add(renderPanel, BorderLayout.CENTER);
 	    
 	    // Add the status message box at the bottom of the pane
 		frame.getContentPane().add(createStatusBox(), BorderLayout.PAGE_END);
@@ -358,11 +364,6 @@ public class ImageToZxSpec {
 		Panel outer = new Panel();
 		JPanel inner = new JPanel() {
 			static final long serialVersionUID = 0;
-
-			@Override
-			public void update(Graphics g) {
-				paint(g);
-			}
 
 			@Override
 			public void paint(Graphics g) {
@@ -592,6 +593,7 @@ public class ImageToZxSpec {
 		 */
 		public void updateMainImage(BufferedImage previewImage) {
 			mainPreviewImage = previewImage;
+			renderPanel.repaint();
 			resizeFrame(previewImage);
 			frame.repaint();
 		}
