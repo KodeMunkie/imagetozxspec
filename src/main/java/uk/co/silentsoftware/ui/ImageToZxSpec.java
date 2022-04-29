@@ -35,6 +35,7 @@ import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import static uk.co.silentsoftware.config.LanguageSupport.getCaption;
 
@@ -54,7 +55,9 @@ public class ImageToZxSpec {
 	private static final ImageIcon SETTINGS_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/Gear.png"));
 	private static final ImageIcon PREVIEW_ICON = new ImageIcon(ImageToZxSpec.class.getResource("/icons/Coherence.png"));	
 	private static final String SINCLAIR_IMAGE_PATH = "/icons/sinclair.png";
-	
+
+	private static final int DEFAULT_FONT_SIZE = 14;
+
 	/**
 	 * The message to show when idle
 	 */
@@ -105,12 +108,12 @@ public class ImageToZxSpec {
 	/**
 	 * The options dialog
 	 */
-	private static PreferencesDialog preferences = new PreferencesDialog();
+	private static PreferencesDialog preferences;
 	
 	/**
 	 * The preview window
 	 */
-	private final PopupPreviewFrame preview = new PopupPreviewFrame(new UiCallback());
+	private PopupPreviewFrame preview;
 	
 	/**
 	 * Main dialog preview panel showing progress
@@ -145,7 +148,10 @@ public class ImageToZxSpec {
 		
 		// Initialises this app's look and feel settings
 		initLookAndFeel();
-		
+
+		preferences  = new PreferencesDialog();
+		preview = new PopupPreviewFrame(new UiCallback());
+
 		// Drag and drop support and the icon image
 		frame.setDropTarget(new DropTarget(frame, new CustomDropTargetListener(new UiCallback())));
 		
@@ -162,7 +168,7 @@ public class ImageToZxSpec {
 		frame.getContentPane().add(createToolbar(), BorderLayout.PAGE_START);
 		
 		// Add the panel for rendering the original + result
-	    frame.getContentPane().add(createRenderPanel(), BorderLayout.CENTER);
+		frame.getContentPane().add(createRenderPanel(), BorderLayout.CENTER);
 	    
 	    // Add the status message box at the bottom of the pane
 		frame.getContentPane().add(createStatusBox(), BorderLayout.PAGE_END);
@@ -192,12 +198,32 @@ public class ImageToZxSpec {
 	private void initLookAndFeel() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			setDefaultFontSize(DEFAULT_FONT_SIZE);
 		} catch(Exception e) {
 			log.debug("Unable to set the platform lnf",e);
 			// Pah just ignore this error, we'll just have a naff looking UI
 		}
 	}
-	
+
+
+	/**
+	 * Sets the a sensible font size suitable for hidef displays
+	 * @param size
+	 */
+	public void setDefaultFontSize(int size) {
+		Set<Object> keySet = UIManager.getLookAndFeelDefaults().keySet();
+		Object[] keys = keySet.toArray(new Object[keySet.size()]);
+		for (Object key : keys) {
+			if (key != null && key.toString().toLowerCase().contains("font")) {
+				Font font = UIManager.getDefaults().getFont(key);
+				if (font != null) {
+					font = font.deriveFont((float)size);
+					UIManager.put(key, font);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Creates a window listener that shuts down the app gracefully
 	 * 
@@ -233,6 +259,7 @@ public class ImageToZxSpec {
 			Dimension dim = new Dimension(specLogo.getWidth(),
 					specLogo.getHeight()+toolBar.getHeight()+statusBox.getHeight()+frame.getInsets().top+frame.getInsets().bottom+menubar.getHeight());
 			frame.setSize(dim);
+			frame.setMinimumSize(dim);
 		    frame.setPreferredSize(dim);
 			frame.repaint();
 			frame.setLocationRelativeTo(null);
@@ -321,14 +348,15 @@ public class ImageToZxSpec {
 
 	/**
 	 * Creates the main dialog's main panel for rendering the preview
-	 * 
+	 * Nb. Needs to be a Swing Jpanel inside an AWT panel since image
+	 * rendering differs from the popup preview frame otherwise!
+	 *
 	 * @return the render panel
 	 */
-	private JPanel createRenderPanel() {
-	/*
-	  The panel for rendering the images
-	 */
-		return new JPanel() {
+	private Panel createRenderPanel() {
+
+		Panel outer = new Panel();
+		JPanel inner = new JPanel() {
 			static final long serialVersionUID = 0;
 
 			@Override
@@ -346,6 +374,9 @@ public class ImageToZxSpec {
 				}
 			}
 		};
+		outer.add(inner);
+		outer.setLayout(new GridLayout(1,1));
+		return outer;
 	}
 
 	/**

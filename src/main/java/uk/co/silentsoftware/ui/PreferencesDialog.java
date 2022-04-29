@@ -60,7 +60,7 @@ class PreferencesDialog extends JFrame  {
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	private static final long serialVersionUID = 1L;
-	
+
 	private final List<DitherChangedListener> ditherChangedListeners = new ArrayList<>();
 	
 	private final JFrame currentInstance;
@@ -80,7 +80,7 @@ class PreferencesDialog extends JFrame  {
 		// The frame defaults
 		setIconImage(ImageToZxSpec.IMAGE_ICON.getImage());
 		setTitle(getCaption("tab_item_control_panel"));
-		setSize(600,480);
+		setSize(820,480);
 	    setLocationRelativeTo(null); 
 	    setResizable(false);
 	    
