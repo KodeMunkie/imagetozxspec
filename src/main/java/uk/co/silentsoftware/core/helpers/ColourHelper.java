@@ -24,6 +24,7 @@ import uk.co.silentsoftware.core.attributestrategy.GigaScreenAttributeStrategy;
 import uk.co.silentsoftware.core.colourstrategy.ColourChoiceStrategy;
 import uk.co.silentsoftware.core.converters.image.processors.GigaScreenAttribute;
 import uk.co.silentsoftware.core.converters.image.processors.GigaScreenAttribute.GigaScreenColour;
+import uk.co.silentsoftware.core.helpers.colourdistance.LuminanceColourDistance;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -142,13 +143,13 @@ public final class ColourHelper {
 
 	/**
 	 * Calculates the luminosity total for a set of rgb values
-	 * based on the NTSC formula  Y = 0.299*r + 0.587*g + 0.114*b.
+	 * based on the NTSC formula
 	 *
 	 * @param rgbVals the rgb value sets
 	 * @return the luminosity sum
 	 */
-	public static float luminositySum(int[] rgbVals) {
-		float sum = 0;
+	public static double luminositySum(int[] rgbVals) {
+		double sum = 0;
 		for (int rgb : rgbVals) {
 			int[] rgbComponents = ColourHelper.intToRgbComponents(rgb);
 			sum += luminosity(rgbComponents[0], rgbComponents[1], rgbComponents[2]);
@@ -156,8 +157,8 @@ public final class ColourHelper {
 		return sum;
 	}
 
-	private static float luminosity(int red, int green, int blue) {
-		return (float)((0.299 * red) + (0.587 * green) + (0.114 * blue));
+	private static double luminosity(int red, int green, int blue) {
+		return ((LuminanceColourDistance.LUMA_RED * red) + (LuminanceColourDistance.LUMA_GREEN* green) + (LuminanceColourDistance.LUMA_BLUE * blue));
 	}
 
 	/**

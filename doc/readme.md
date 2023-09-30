@@ -36,7 +36,7 @@ resolution).
 ### Installation/Usage
 If you have Java installed just double click the Img2ZXSpec.jar
 file (like you would a regular .exe file). If you don't have Java
-you need to get it first - <http://www.java.com/getjava>
+you need to get it first - <https://www.oracle.com/java/technologies/downloads/>
 The easiest way to learn how to use Image to Zx Spec is just to play with 
 it, you can even change most image options during image conversion.
 For information on advanced features read on...
@@ -265,13 +265,11 @@ reduce attribute artifact edges.
 
 #### Colour Distance Algorithm
 When making a decision on which Spectrum colours best match those of the source 
-image's pixels a colour space "distance" is evaluated.
+image's pixels an RGB colour space "distance" is evaluated.
 The choice of algorithm for this evaluation is configured here - typically
-the Compuphase algorithm is the best and uses heuristics based on human vision,
+the Luminance or Compuphase algorithms perform the best and use heuristics based on human vision,
 the classic Image to ZX Spec algorithm next (which is just a simple sum of RGB space distances), 
-followed by the Euclidean which is the straight line distance in RGB space. You may find
-any one of these better suits your use case, typically the latter two are interchangeable however
-classic tends to occasionally favour darker colours which can lead to better results.
+followed by the Euclidean which is the straight line distance in RGB space.
 
 #### Video Import Engine
 By default Image to ZX Spec's uses HumbleVideo which is fast platform native video

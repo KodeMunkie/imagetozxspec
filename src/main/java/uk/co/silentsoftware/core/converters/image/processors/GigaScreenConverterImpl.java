@@ -202,8 +202,8 @@ public class GigaScreenConverterImpl implements ImageConverter {
             for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= output1.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= output1.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
                 int outRgb1[] = output1.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, null, 0, ATTRIBUTE_BLOCK_SIZE);
                 int outRgb2[] = output2.getRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, null, 0, ATTRIBUTE_BLOCK_SIZE);
-                float sum1 = luminositySum(outRgb1);
-                float sum2 = luminositySum(outRgb2);
+                double sum1 = luminositySum(outRgb1);
+                double sum2 = luminositySum(outRgb2);
                 if (sum1 > sum2) {
                     output1.setRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, outRgb2, 0, ATTRIBUTE_BLOCK_SIZE);
                     output2.setRGB(x, y, ATTRIBUTE_BLOCK_SIZE, ATTRIBUTE_BLOCK_SIZE, outRgb1, 0, ATTRIBUTE_BLOCK_SIZE);
