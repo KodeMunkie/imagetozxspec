@@ -1,6 +1,10 @@
 Image to ZX Spec Changes
 ------------------------
 
+Version 2.3.0
+- Added Luminance Closest Colour Strategy from old hanging branch.
+- Updated Copyrights.
+
 Version 2.2.2
 - Fixed Java 17 compatibility.
 - Fixed High res display font issue.
