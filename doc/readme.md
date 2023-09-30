@@ -36,7 +36,7 @@ resolution).
 ### Installation/Usage
 If you have Java installed just double click the Img2ZXSpec.jar
 file (like you would a regular .exe file). If you don't have Java
-you need to get it first - <http://www.java.com/getjava>
+you need to get it first - <https://www.oracle.com/java/technologies/downloads/>
 The easiest way to learn how to use Image to Zx Spec is just to play with 
 it, you can even change most image options during image conversion.
 For information on advanced features read on...
