@@ -29,9 +29,9 @@ import uk.co.silentsoftware.core.helpers.colourdistance.LuminanceColourDistance;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.time.Duration;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static uk.co.silentsoftware.config.SpectrumDefaults.ATTRIBUTE_BLOCK_SIZE;
 /**
@@ -41,13 +41,11 @@ public final class ColourHelper {
 
 	private static final int MAXIMUM_COMPONENT_VALUE = 255;
 
-	private static final int PREFER_DETAIL_COMPONENT_BOUNDARY = 127;
-
 	private static final int CACHE_TIME_SECONDS = 10;
 
-	private static final Cache<String, GigaScreenAttribute.GigaScreenColour> CACHE = Caffeine.newBuilder().expireAfterAccess(CACHE_TIME_SECONDS, TimeUnit.SECONDS).build();
+	private static final Cache<String, GigaScreenAttribute.GigaScreenColour> CACHE = Caffeine.newBuilder().expireAfterAccess(Duration.ofSeconds(CACHE_TIME_SECONDS)).build();
 
-	private static final Cache<String, int[]> AVERAGE_CACHE = Caffeine.newBuilder().expireAfterAccess(CACHE_TIME_SECONDS, TimeUnit.SECONDS).build();
+	private static final Cache<String, int[]> AVERAGE_CACHE = Caffeine.newBuilder().expireAfterAccess(Duration.ofSeconds(CACHE_TIME_SECONDS)).build();
 
 
 	/**
@@ -205,20 +203,20 @@ public final class ColourHelper {
 	 * selecting xMax by yMax parts of the output image (i.e. usually 8x8
 	 * pixels), chooses the most popular two colours. The colour choice strategy
 	 * then decides how to colour individual pixels based on these two colours.
-	 * 
+	 *
 	 * Note it is expected that this method will be called AFTER the pixels have
 	 * been changed to Spectrum colours.
-	 * 
+	 *
 	 * @param image the image to colour
 	 * @param colourChoiceStrategy the colour choice strategy
 	 * @return the modified image
 	 */
 	public static BufferedImage colourAttributes(BufferedImage image, ColourChoiceStrategy colourChoiceStrategy) {
 
-		// Do not use bidimap because inverse map key values will be lost (i.e. many tallies will produce same key)	
+		// Do not use bidimap because inverse map key values will be lost (i.e. many tallies will produce same key)
 		Map<Integer, Integer> map = new HashMap<>();
 		List<TallyValue> tallyValues = new LinkedList<>();
-		
+
 		// Analyse block and choose the two most popular colours in attribute block
 		for (int y = 0; y + ATTRIBUTE_BLOCK_SIZE <= image.getHeight(); y += ATTRIBUTE_BLOCK_SIZE) {
 			for (int x = 0; x + ATTRIBUTE_BLOCK_SIZE <= image.getWidth() && y + ATTRIBUTE_BLOCK_SIZE <= image.getHeight(); x += ATTRIBUTE_BLOCK_SIZE) {
@@ -240,15 +238,15 @@ public final class ColourHelper {
 					tallyValues.add(new TallyValue(colour, tally));
 				});
 				tallyValues.sort(TallyValue.TALLY_COMPARATOR);
-				
+
 				int mostPopularColour = tallyValues.get(0).getColour();
 				int secondMostPopularColour = tallyValues.size()>1?tallyValues.get(1).getColour():mostPopularColour;
-				
+
 				// Enforce attribute favouritism rules on the two spectrum
 				// attribute colours (fixes the problem that colours could be from both the bright
 				// and half bright set).
 				int[] correctedAlphaColours = OptionsObject.getInstance().getAttributeMode().enforceAttributeRule(mostPopularColour, secondMostPopularColour);
-							
+
 				// Replace all colours in attribute block (which can be any spectrum colours) with the just the popular two
 				for (int i = 0; i < outRgb.length; ++i) {
 					outRgb[i] = colourChoiceStrategy.chooseBestPaletteMatch(outRgb[i], correctedAlphaColours);
@@ -262,7 +260,7 @@ public final class ColourHelper {
 	/**
 	 * Determines whether the colour is from the Spectrum's bright or half
 	 * bright colour set.
-	 * 
+	 *
 	 * @param rgb the colour to test
 	 * @return whether this colour is in the bright set
 	 */
@@ -281,9 +279,9 @@ public final class ColourHelper {
 
 	/**
 	 * Changes the contrast of an image
-	 * 
+	 *
 	 * @see java.awt.image.RescaleOp
-	 * 
+	 *
 	 * @param img the image to change the contrast of
 	 * @param amount the amount to change it (scale factor)
 	 * @return the modified image
@@ -298,9 +296,9 @@ public final class ColourHelper {
 
 	/**
 	 * Changes brightness by increasing all pixel values by a given amount
-	 * 
+	 *
 	 * @see java.awt.image.RescaleOp
-	 * 
+	 *
 	 * @param img the image to change the brightness of
 	 * @param amount the amount to change it
 	 * @return the modified image
@@ -315,7 +313,7 @@ public final class ColourHelper {
 
 	/**
 	 * Changes image saturation by a given amount
-	 * 
+	 *
 	 * @param img the image to change
 	 * @param amount the amount of saturation (0-1 range)
 	 * @return the modified image
@@ -335,7 +333,7 @@ public final class ColourHelper {
 	/**
 	 * Changes the saturation of an individual pixel by the given amount (0-1
 	 * range)
-	 * 
+	 *
 	 * @param pixel the pixel rgb to saturate
 	 * @param amount the amount to saturate
 	 * @return the modified rgb pixel
@@ -351,7 +349,7 @@ public final class ColourHelper {
 	/**
 	 * Ensures a value is within a given range. If it exceeds or is below it is
 	 * set to the high value or low value respectively
-	 * 
+	 *
 	 * @param value the value to test
 	 * @param low the low value
 	 * @param high the high value
@@ -366,11 +364,11 @@ public final class ColourHelper {
 		}
 		return value;
 	}
-	
+
 	/**
 	 * Ensures a value is within a given range. If it exceeds or is below it is
 	 * set to the high value or low value respectively
-	 * 
+	 *
 	 * @param value the value to test
 	 * @param low the low value
 	 * @param high the high value
@@ -388,7 +386,7 @@ public final class ColourHelper {
 
 	/**
 	 * Convert rgb to its components
-	 * 
+	 *
 	 * @param rgb the value to split
 	 * @return the rgb components
 	 */
@@ -398,7 +396,7 @@ public final class ColourHelper {
 
 	/**
 	 * Convert individual RGB components into a 32 bit ARGB value
-	 * 
+	 *
 	 * @param red the red component
 	 * @param green the green component
 	 * @param blue the blue component
@@ -410,7 +408,7 @@ public final class ColourHelper {
 
 	/**
 	 * Corrects and individual colour component value's range to 0>channel<255
-	 * 
+	 *
 	 * @param component the component to restrict
 	 * @return the corrected component
 	 */
@@ -421,9 +419,9 @@ public final class ColourHelper {
 	/**
 	 * Returns an array of black and white colours representing the ink (black)
 	 * and paper (white) monochrome colours.
-	 * 
+	 *
 	 * Opposite function to getMonochromeFromBlackAndWhite
-	 * 
+	 *
 	 * @param image the monochrome image to scan
 	 * @return an array of black and white rgb values
 	 */
@@ -442,9 +440,9 @@ public final class ColourHelper {
 	/**
 	 * Returns an array of monochrome (chosen ink and paper) colours based on an
 	 * input array of black (ink) and white (paper).
-	 * 
+	 *
 	 * Opposite function to getBlackAndWhiteFromMonochrome
-	 * 
+	 *
 	 * @param data the black and white array to get the monochrome colours for
 	 * @return the equivalent monochrome array
 	 */
@@ -459,7 +457,7 @@ public final class ColourHelper {
 	/**
 	 * Returns an a monochrome (chosen ink and paper) colour based on an
 	 * input array of black (ink) and white (paper).
-	 * 
+	 *
 	 * @param original the black and white rgb value to get the monochrome colour for
 	 * @return the equivalent monochrome colour
 	 */
