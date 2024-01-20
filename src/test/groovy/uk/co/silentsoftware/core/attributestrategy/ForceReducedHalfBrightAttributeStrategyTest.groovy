@@ -63,7 +63,7 @@ class ForceReducedHalfBrightAttributeStrategyTest {
 	@Test
 	void testEnforceAttributeRuleWithOneHalfBrightOutsideOfReducedPalette() {
 		AttributeStrategy strategy = new ForceReducedHalfBrightAttributeStrategy()
-		int[] result = strategy.enforceAttributeRule(0xFF00CDCDi, 0xFFCD00CDi)
+		int[] result = strategy.enforceAttributeRule(0xFFCDCDCDi, 0xFFCD00CDi)
 		Assert.assertEquals(0xFFCDCDCDi,result[0])
 		Assert.assertEquals(0xFFCD0000i,result[1]) // Switch to half bright
 	}

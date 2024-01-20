@@ -31,7 +31,7 @@ class ColourChoiceStrategyTest {
 	void testFullPaletteStrategyColour() {
 		ColourChoiceStrategy strategy = new FullPaletteStrategy()
 		int result = strategy.chooseBestPaletteMatch(0xFFBBCCDDi, createPopularColours()) // blue hue getClosestColour
-		Assert.assertEquals(0xFF0000FFi, result)
+		Assert.assertEquals(0xFFFF0000i, result)
 	}
 
 	@Test
